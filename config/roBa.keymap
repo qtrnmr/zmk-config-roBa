@@ -4,6 +4,7 @@
 #include <dt-bindings/zmk/pointing.h>
 
 #undef ZMK_POINTING_DEFAULT_SCRL_VAL
+
 #define ZMK_POINTING_DEFAULT_SCRL_VAL 80
 
 &mt {
@@ -85,6 +86,15 @@
 
             tap-ms = <50>;
         };
+
+        encoder_vol_down_up: encoder_vol_down_up {
+            compatible = "zmk,behavior-sensor-rotate";
+            label = "ENCODER_VOL_DOWN_UP";
+            #sensor-binding-cells = <0>;
+            bindings = <&kp C_VOLUME_DOWN>, <&kp C_VOLUME_UP>;
+
+            tap-ms = <20>;
+        };
     };
 
     keymap {
@@ -92,10 +102,10 @@
 
         default_layer {
             bindings = <
-&kp Q             &kp W         &kp E         &kp R                        &kp T                                                          &kp Y        &kp U  &lt 5 I    &kp O    &kp P
-&kp A             &kp S         &kp D         &kp F                        &kp G        &kp LS(LG(S))                      &kp MINUS      &kp H        &kp J  &kp K      &kp L    &kp SQT
-&mt LEFT_SHIFT Z  &kp X         &kp C         &kp V                        &kp B        &kp COLON                          &kp SEMICOLON  &kp N        &kp M  &kp COMMA  &kp DOT  &kp SLASH
-&kp LCTRL         &kp LEFT_WIN  &kp LEFT_ALT  &lt_to_layer_0 6 INT_HENKAN  &lt 2 SPACE  &lt_to_layer_0 3 INT_MUHENKAN      &kp BACKSPACE  &lt 1 ENTER                             &kp DEL
+&kp Q               &kp W         &kp E         &kp R                        &kp T                                                          &kp Y        &kp U  &lt 5 I    &kp O    &kp P
+&mt LEFT_CONTROL A  &kp S         &kp D         &kp F                        &kp G        &kp LS(LG(S))                      &kp MINUS      &kp H        &kp J  &kp K      &kp L    &kp SQT
+&mt LEFT_SHIFT Z    &kp X         &kp C         &kp V                        &kp B        &kp COLON                          &kp SEMICOLON  &kp N        &kp M  &kp COMMA  &kp DOT  &kp SLASH
+&kp LCTRL           &kp LEFT_WIN  &kp LEFT_ALT  &lt_to_layer_0 6 INT_HENKAN  &lt 2 SPACE  &lt_to_layer_0 3 INT_MUHENKAN      &kp BACKSPACE  &lt 1 ENTER                             &kp DEL
             >;
 
             sensor-bindings = <&encoder_msc_down_up>;
@@ -127,7 +137,7 @@
 &trans          &trans                  &trans          &trans                   &trans   &trans      &trans  &trans                          &trans
             >;
 
-            sensor-bindings = <&inc_dec_kp LC(PAGE_UP) LC(PAGE_DOWN)>;
+            sensor-bindings = <&encoder_vol_down_up>;
         };
 
         MOUSE {
