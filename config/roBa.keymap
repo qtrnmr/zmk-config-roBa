@@ -71,20 +71,6 @@
             bindings = <&to 0 &macro_param_1to1 &kp MACRO_PLACEHOLDER>;
             label = "TO_LAYER_0";
         };
-
-        ToggleWindowRight: ToggleWindow {
-            compatible = "zmk,behavior-macro";
-            #binding-cells = <0>;
-            bindings = <&kp LC(LEFT_WIN) &kp RIGHT>;
-            label = "TOGGLEWINDOW";
-        };
-
-        ToggleWindowLeft: ToggleWindowLeft {
-            compatible = "zmk,behavior-macro";
-            #binding-cells = <0>;
-            bindings = <&kp LC(LEFT_WIN) &kp LEFT>;
-            label = "TOGGLEWINDOWLEFT";
-        };
     };
 
     behaviors {
@@ -161,10 +147,10 @@
 
         MOUSE {
             bindings = <
-&trans  &trans  &trans  &trans  &trans                      &trans               &ToggleWindowLeft  &kp LC(E)  &ToggleWindowRight  &mt LC(LS(T)) LC(W)
-&trans  &trans  &trans  &trans  &trans  &trans      &trans  &kp LC(T)            &mkp MB1           &mkp MB3   &mkp MB2            &trans
-&trans  &trans  &trans  &trans  &trans  &trans      &trans  &mt LC(LS(N)) LC(N)  &mkp MB4           &trans     &mkp MB5            &trans
-&trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans                                                                 &trans
+&trans  &trans  &trans  &trans  &trans                      &trans               &kp LC(LG(LEFT))  &kp LC(E)  &kp LC(LG(RIGHT))  &mt LC(LS(T)) LC(W)
+&trans  &trans  &trans  &trans  &trans  &trans      &trans  &kp LC(T)            &mkp MB1          &mkp MB3   &mkp MB2           &trans
+&trans  &trans  &trans  &trans  &trans  &trans      &trans  &mt LC(LS(N)) LC(N)  &mkp MB4          &trans     &mkp MB5           &trans
+&trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans                                                               &trans
             >;
         };
 
