@@ -2,9 +2,9 @@
 #include <dt-bindings/zmk/bt.h>
 #include <dt-bindings/zmk/keys.h>
 #include <dt-bindings/zmk/pointing.h>
-#include <input/processors.dtsi>
 
 #undef ZMK_POINTING_DEFAULT_SCRL_VAL
+
 #define ZMK_POINTING_DEFAULT_SCRL_VAL 80
 
 &mt {
@@ -13,8 +13,7 @@
 };
 
 &trackball {
-    /* automouse-layer は zip_temp_layer で置き換えるため無効化 */
-    /* automouse-layer = <4>; */
+    automouse-layer = <4>;
     scroll-layers = <5>;
 
     // arrows {
@@ -30,13 +29,7 @@
     // };
 };
 
-/* 既存の trackball_listener ノードに “即戻り”を付与 */
-&trackball_listener {
-    /* <layer, timeout_ms> : 入力中のみ Layer 4、無入力 1ms でオフ */
-    input-processors = <&zip_temp_layer 4 1>;
-};
-
- / {
+/ {
     combos {
         compatible = "zmk,combos";
 
@@ -85,6 +78,7 @@
             compatible = "zmk,behavior-hold-tap";
             label = "LAYER_TAP_TO_0";
             bindings = <&mo>, <&to_layer_0>;
+
             #binding-cells = <2>;
             tapping-term-ms = <200>;
         };
@@ -94,6 +88,7 @@
             label = "ENCODER_MSC_DOWN_UP";
             #sensor-binding-cells = <0>;
             bindings = <&msc SCRL_UP>, <&msc SCRL_DOWN>;
+
             tap-ms = <50>;
         };
 
@@ -102,6 +97,7 @@
             label = "ENCODER_VOL_DOWN_UP";
             #sensor-binding-cells = <0>;
             bindings = <&kp C_VOLUME_DOWN>, <&kp C_VOLUME_UP>;
+
             tap-ms = <20>;
         };
     };
