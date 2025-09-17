@@ -30,18 +30,13 @@
     // };
 };
 
-/ {
-    /* トラックボール入力中のみ Layer 4 を有効化し、無入力 1ms で即オフ */
-    input_listeners {
-        compatible = "zmk,input-listeners";
+/* 既存の trackball_listener ノードに “即戻り”を付与 */
+&trackball_listener {
+    /* <layer, timeout_ms> : 入力中のみ Layer 4、無入力 1ms でオフ */
+    input-processors = <&zip_temp_layer 4 1>;
+};
 
-        trackball_listener: trackball_listener {
-            device = <&trackball>;
-            /* <layer, timeout_ms> */
-            input-processors = <&zip_temp_layer 4 1>;
-        };
-    };
-
+ / {
     combos {
         compatible = "zmk,combos";
 
@@ -90,7 +85,6 @@
             compatible = "zmk,behavior-hold-tap";
             label = "LAYER_TAP_TO_0";
             bindings = <&mo>, <&to_layer_0>;
-
             #binding-cells = <2>;
             tapping-term-ms = <200>;
         };
