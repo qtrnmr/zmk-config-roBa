@@ -71,6 +71,20 @@
             bindings = <&to 0 &macro_param_1to1 &kp MACRO_PLACEHOLDER>;
             label = "TO_LAYER_0";
         };
+
+        ToggleWindowRight: ToggleWindow {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&kp LC(LEFT_WIN) &kp RIGHT>;
+            label = "TOGGLEWINDOW";
+        };
+
+        ToggleWindowLeft: ToggleWindowLeft {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&kp LC(LEFT_WIN) &kp LEFT>;
+            label = "TOGGLEWINDOWLEFT";
+        };
     };
 
     behaviors {
