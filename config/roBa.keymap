@@ -131,10 +131,10 @@
 
         ARROW {
             bindings = <
-&trans  &trans          &kp UP_ARROW    &trans           &trans                          &trans  &trans        &kp LG(UP_ARROW)    &trans               &trans
-&trans  &kp LEFT_ARROW  &kp DOWN_ARROW  &kp RIGHT_ARROW  &trans  &kp C_MUTE      &trans  &trans  &kp LG(LEFT)  &kp LG(DOWN_ARROW)  &kp LG(RIGHT_ARROW)  &trans
-&trans  &trans          &trans          &trans           &trans  &trans          &trans  &trans  &trans        &trans              &trans               &trans
-&trans  &trans          &trans          &trans           &trans  &trans          &trans  &trans                                                         &trans
+&trans  &trans          &kp UP_ARROW    &trans           &trans                          &trans  &trans        &kp LG(UP)    &trans         &trans
+&trans  &kp LEFT_ARROW  &kp DOWN_ARROW  &kp RIGHT_ARROW  &trans  &kp C_MUTE      &trans  &trans  &kp LG(LEFT)  &kp LG(DOWN)  &kp LG(RIGHT)  &trans
+&trans  &trans          &trans          &trans           &trans  &trans          &trans  &trans  &trans        &trans        &trans         &trans
+&trans  &trans          &trans          &trans           &trans  &trans          &trans  &trans                                             &trans
             >;
 
             sensor-bindings = <&encoder_vol_down_up>;
