@@ -317,7 +317,5 @@ combos:
   k: BACKSPACE
 - p: [20, 21]
   k: DELETE
-- p: [34, 22, 23]
+- p: [22, 23, 24]
   k: Ctl+Sft+Z
-- p: [2, 1, 0]
-  k: CAPSLOCK

@@ -337,16 +337,12 @@ path.combo {
 <text x="701" y="108" class="combo tap">DELETE</text>
 </g>
 <g class="combo combopos-4">
-<rect rx="6" ry="6" x="33" y="174" width="28" height="26" class="combo"/>
-<text x="47" y="187" class="combo tap">
-<tspan x="47" dy="-0.6em">Ctl+Sft</tspan><tspan x="47" dy="1.2em">+Z</tspan>
+<path d="M84,156 l-38,13" class="combo"/>
+<path d="M84,156 l38,-11" class="combo"/>
+<rect rx="6" ry="6" x="70" y="143" width="28" height="26" class="combo"/>
+<text x="84" y="156" class="combo tap">
+<tspan x="84" dy="-0.6em">Ctl+Sft</tspan><tspan x="84" dy="1.2em">+Z</tspan>
 </text>
-</g>
-<g class="combo combopos-5">
-<path d="M84,44 l38,-11" class="combo"/>
-<path d="M84,44 l-38,13" class="combo"/>
-<rect rx="6" ry="6" x="70" y="31" width="28" height="26" class="combo"/>
-<text x="84" y="44" class="combo tap"><tspan style="font-size: 88%">CAPSLOCK</tspan></text>
 </g>
 </g>
 </g>
@@ -534,16 +530,12 @@ path.combo {
 <text x="701" y="108" class="combo tap">DELETE</text>
 </g>
 <g class="combo combopos-4">
-<rect rx="6" ry="6" x="33" y="174" width="28" height="26" class="combo"/>
-<text x="47" y="187" class="combo tap">
-<tspan x="47" dy="-0.6em">Ctl+Sft</tspan><tspan x="47" dy="1.2em">+Z</tspan>
+<path d="M84,156 l-38,13" class="combo"/>
+<path d="M84,156 l38,-11" class="combo"/>
+<rect rx="6" ry="6" x="70" y="143" width="28" height="26" class="combo"/>
+<text x="84" y="156" class="combo tap">
+<tspan x="84" dy="-0.6em">Ctl+Sft</tspan><tspan x="84" dy="1.2em">+Z</tspan>
 </text>
-</g>
-<g class="combo combopos-5">
-<path d="M84,44 l38,-11" class="combo"/>
-<path d="M84,44 l-38,13" class="combo"/>
-<rect rx="6" ry="6" x="70" y="31" width="28" height="26" class="combo"/>
-<text x="84" y="44" class="combo tap"><tspan style="font-size: 88%">CAPSLOCK</tspan></text>
 </g>
 </g>
 </g>
@@ -761,16 +753,12 @@ path.combo {
 <text x="701" y="108" class="combo tap">DELETE</text>
 </g>
 <g class="combo combopos-4">
-<rect rx="6" ry="6" x="33" y="174" width="28" height="26" class="combo"/>
-<text x="47" y="187" class="combo tap">
-<tspan x="47" dy="-0.6em">Ctl+Sft</tspan><tspan x="47" dy="1.2em">+Z</tspan>
+<path d="M84,156 l-38,13" class="combo"/>
+<path d="M84,156 l38,-11" class="combo"/>
+<rect rx="6" ry="6" x="70" y="143" width="28" height="26" class="combo"/>
+<text x="84" y="156" class="combo tap">
+<tspan x="84" dy="-0.6em">Ctl+Sft</tspan><tspan x="84" dy="1.2em">+Z</tspan>
 </text>
-</g>
-<g class="combo combopos-5">
-<path d="M84,44 l38,-11" class="combo"/>
-<path d="M84,44 l-38,13" class="combo"/>
-<rect rx="6" ry="6" x="70" y="31" width="28" height="26" class="combo"/>
-<text x="84" y="44" class="combo tap"><tspan style="font-size: 88%">CAPSLOCK</tspan></text>
 </g>
 </g>
 </g>
@@ -981,16 +969,12 @@ path.combo {
 <text x="701" y="108" class="combo tap">DELETE</text>
 </g>
 <g class="combo combopos-4">
-<rect rx="6" ry="6" x="33" y="174" width="28" height="26" class="combo"/>
-<text x="47" y="187" class="combo tap">
-<tspan x="47" dy="-0.6em">Ctl+Sft</tspan><tspan x="47" dy="1.2em">+Z</tspan>
+<path d="M84,156 l-38,13" class="combo"/>
+<path d="M84,156 l38,-11" class="combo"/>
+<rect rx="6" ry="6" x="70" y="143" width="28" height="26" class="combo"/>
+<text x="84" y="156" class="combo tap">
+<tspan x="84" dy="-0.6em">Ctl+Sft</tspan><tspan x="84" dy="1.2em">+Z</tspan>
 </text>
-</g>
-<g class="combo combopos-5">
-<path d="M84,44 l38,-11" class="combo"/>
-<path d="M84,44 l-38,13" class="combo"/>
-<rect rx="6" ry="6" x="70" y="31" width="28" height="26" class="combo"/>
-<text x="84" y="44" class="combo tap"><tspan style="font-size: 88%">CAPSLOCK</tspan></text>
 </g>
 </g>
 </g>
@@ -1201,16 +1185,12 @@ path.combo {
 <text x="701" y="108" class="combo tap">DELETE</text>
 </g>
 <g class="combo combopos-4">
-<rect rx="6" ry="6" x="33" y="174" width="28" height="26" class="combo"/>
-<text x="47" y="187" class="combo tap">
-<tspan x="47" dy="-0.6em">Ctl+Sft</tspan><tspan x="47" dy="1.2em">+Z</tspan>
+<path d="M84,156 l-38,13" class="combo"/>
+<path d="M84,156 l38,-11" class="combo"/>
+<rect rx="6" ry="6" x="70" y="143" width="28" height="26" class="combo"/>
+<text x="84" y="156" class="combo tap">
+<tspan x="84" dy="-0.6em">Ctl+Sft</tspan><tspan x="84" dy="1.2em">+Z</tspan>
 </text>
-</g>
-<g class="combo combopos-5">
-<path d="M84,44 l38,-11" class="combo"/>
-<path d="M84,44 l-38,13" class="combo"/>
-<rect rx="6" ry="6" x="70" y="31" width="28" height="26" class="combo"/>
-<text x="84" y="44" class="combo tap"><tspan style="font-size: 88%">CAPSLOCK</tspan></text>
 </g>
 </g>
 </g>
@@ -1405,16 +1385,12 @@ path.combo {
 <text x="701" y="108" class="combo tap">DELETE</text>
 </g>
 <g class="combo combopos-4">
-<rect rx="6" ry="6" x="33" y="174" width="28" height="26" class="combo"/>
-<text x="47" y="187" class="combo tap">
-<tspan x="47" dy="-0.6em">Ctl+Sft</tspan><tspan x="47" dy="1.2em">+Z</tspan>
+<path d="M84,156 l-38,13" class="combo"/>
+<path d="M84,156 l38,-11" class="combo"/>
+<rect rx="6" ry="6" x="70" y="143" width="28" height="26" class="combo"/>
+<text x="84" y="156" class="combo tap">
+<tspan x="84" dy="-0.6em">Ctl+Sft</tspan><tspan x="84" dy="1.2em">+Z</tspan>
 </text>
-</g>
-<g class="combo combopos-5">
-<path d="M84,44 l38,-11" class="combo"/>
-<path d="M84,44 l-38,13" class="combo"/>
-<rect rx="6" ry="6" x="70" y="31" width="28" height="26" class="combo"/>
-<text x="84" y="44" class="combo tap"><tspan style="font-size: 88%">CAPSLOCK</tspan></text>
 </g>
 </g>
 </g>
@@ -1616,16 +1592,12 @@ path.combo {
 <text x="701" y="108" class="combo tap">DELETE</text>
 </g>
 <g class="combo combopos-4">
-<rect rx="6" ry="6" x="33" y="174" width="28" height="26" class="combo"/>
-<text x="47" y="187" class="combo tap">
-<tspan x="47" dy="-0.6em">Ctl+Sft</tspan><tspan x="47" dy="1.2em">+Z</tspan>
+<path d="M84,156 l-38,13" class="combo"/>
+<path d="M84,156 l38,-11" class="combo"/>
+<rect rx="6" ry="6" x="70" y="143" width="28" height="26" class="combo"/>
+<text x="84" y="156" class="combo tap">
+<tspan x="84" dy="-0.6em">Ctl+Sft</tspan><tspan x="84" dy="1.2em">+Z</tspan>
 </text>
-</g>
-<g class="combo combopos-5">
-<path d="M84,44 l38,-11" class="combo"/>
-<path d="M84,44 l-38,13" class="combo"/>
-<rect rx="6" ry="6" x="70" y="31" width="28" height="26" class="combo"/>
-<text x="84" y="44" class="combo tap"><tspan style="font-size: 88%">CAPSLOCK</tspan></text>
 </g>
 </g>
 </g>
