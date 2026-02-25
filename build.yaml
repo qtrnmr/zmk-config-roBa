@@ -24,14 +24,14 @@ include:
     cmake-args: >
       -DCONFIG_BT_CTLR_TX_PWR_PLUS_8=y
       -DCONFIG_BT_CTLR_PHY_2M=n
-      -DCONFIG_BT_PERIPHERAL_PREF_MIN_INT=6
-      -DCONFIG_BT_PERIPHERAL_PREF_MAX_INT=9
+      -DCONFIG_BT_PERIPHERAL_PREF_MIN_INT=8
+      -DCONFIG_BT_PERIPHERAL_PREF_MAX_INT=8
   - board: seeeduino_xiao_ble
     shield: roBa_L
     cmake-args: >
       -DCONFIG_BT_CTLR_TX_PWR_PLUS_8=y
       -DCONFIG_BT_CTLR_PHY_2M=n
-      -DCONFIG_BT_PERIPHERAL_PREF_MIN_INT=6
-      -DCONFIG_BT_PERIPHERAL_PREF_MAX_INT=9
+      -DCONFIG_BT_PERIPHERAL_PREF_MIN_INT=8
+      -DCONFIG_BT_PERIPHERAL_PREF_MAX_INT=8
   - board: seeeduino_xiao_ble
     shield: settings_reset
