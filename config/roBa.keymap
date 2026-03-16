@@ -7,15 +7,21 @@
 
 #define ZMK_POINTING_DEFAULT_SCRL_VAL 80
 
-#define L_DEFAULT    0
-#define L_APPLE      1
-#define L_FUNCTION   2
-#define L_NUM        3
-#define L_ARROW      4
-#define L_MOUSE      5
-#define L_SCROLL     6
-#define L_SETTING    7
-#define L_APPLEMOUSE 8
+#define L_DEFAULT      0
+#define L_APPLE        1
+#define L_FUNCTION     2
+#define L_NUM          3
+#define L_ARROW        4
+#define L_MOUSE        5
+#define L_SCROLL       6
+#define L_SETTING      7
+#define L_APPLEMOUSE   8
+#define L_IPAD         9
+#define L_IPHONE       10
+#define L_IPAD_ARROW   11
+#define L_IPHONE_ARROW 12
+#define L_IPAD_MOUSE   13
+#define L_IPHONE_MOUSE 14
 
 &mt {
     flavor = "balanced";
@@ -72,7 +78,7 @@
         redo_apple {
             bindings = <&kp LG(LS(Z))>;
             key-positions = <22 23 24>;
-            layers = <L_APPLE L_APPLEMOUSE>;
+            layers = <L_APPLE L_APPLEMOUSE L_IPAD L_IPHONE L_IPAD_MOUSE L_IPHONE_MOUSE>;
         };
     };
 
@@ -89,6 +95,20 @@
             #binding-cells = <1>;
             bindings = <&to L_APPLE &macro_param_1to1 &kp MACRO_PLACEHOLDER>;
             label = "TO_APPLE_DEFAULT";
+        };
+
+        to_ipad: to_ipad {
+            compatible = "zmk,behavior-macro-one-param";
+            #binding-cells = <1>;
+            bindings = <&to L_IPAD &macro_param_1to1 &kp MACRO_PLACEHOLDER>;
+            label = "TO_IPAD";
+        };
+
+        to_iphone: to_iphone {
+            compatible = "zmk,behavior-macro-one-param";
+            #binding-cells = <1>;
+            bindings = <&to L_IPHONE &macro_param_1to1 &kp MACRO_PLACEHOLDER>;
+            label = "TO_IPHONE";
         };
 
         bt_to_win0: bt_to_win0 {
@@ -115,14 +135,14 @@
         bt_to_ipad: bt_to_ipad {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
-            bindings = <&bt BT_SEL 3 &to L_APPLE>;
+            bindings = <&bt BT_SEL 3 &to L_IPAD>;
             label = "BT_TO_IPAD";
         };
 
         bt_to_iphone: bt_to_iphone {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
-            bindings = <&bt BT_SEL 4 &to L_APPLE>;
+            bindings = <&bt BT_SEL 4 &to L_IPHONE>;
             label = "BT_TO_IPHONE";
         };
     };
@@ -141,6 +161,24 @@
             compatible = "zmk,behavior-hold-tap";
             label = "LAYER_TAP_TO_APPLE";
             bindings = <&mo>, <&to_apple_default>;
+
+            #binding-cells = <2>;
+            tapping-term-ms = <200>;
+        };
+
+        lt_to_ipad: lt_to_ipad {
+            compatible = "zmk,behavior-hold-tap";
+            label = "LAYER_TAP_TO_IPAD";
+            bindings = <&mo>, <&to_ipad>;
+
+            #binding-cells = <2>;
+            tapping-term-ms = <200>;
+        };
+
+        lt_to_iphone: lt_to_iphone {
+            compatible = "zmk,behavior-hold-tap";
+            label = "LAYER_TAP_TO_IPHONE";
+            bindings = <&mo>, <&to_iphone>;
 
             #binding-cells = <2>;
             tapping-term-ms = <200>;
@@ -171,6 +209,26 @@
         apple_mouse {
             if-layers = <L_APPLE L_MOUSE>;
             then-layer = <L_APPLEMOUSE>;
+        };
+
+        ipad_mouse {
+            if-layers = <L_IPAD L_MOUSE>;
+            then-layer = <L_IPAD_MOUSE>;
+        };
+
+        ipad_arrow {
+            if-layers = <L_IPAD L_ARROW>;
+            then-layer = <L_IPAD_ARROW>;
+        };
+
+        iphone_mouse {
+            if-layers = <L_IPHONE L_MOUSE>;
+            then-layer = <L_IPHONE_MOUSE>;
+        };
+
+        iphone_arrow {
+            if-layers = <L_IPHONE L_ARROW>;
+            then-layer = <L_IPHONE_ARROW>;
         };
     };
 
@@ -261,6 +319,68 @@
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans  &trans        &trans  &trans         &trans
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans  &trans        &trans  &trans         &trans
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans                                      &trans
+            >;
+        };
+
+        IPAD {
+            bindings = <
+&kp Q             &kp W         &kp E         &kp R                       &kp T                                                               &kp Y        &kp U  &kp I               &kp O    &kp P
+&mt LEFT_GUI A    &kp S         &kp D         &kp F                       &kp G        &kp K_MUTE                              &kp MINUS      &kp H        &kp J  &kp K               &kp L    &kp SQT
+&mt LEFT_SHIFT Z  &kp X         &kp C         &kp V                       &kp B        &mo L_SETTING                           &kp SEMICOLON  &kp N        &kp M  &lt L_SCROLL COMMA  &kp DOT  &kp SLASH
+&kp LCTRL         &kp LEFT_ALT  &kp LEFT_GUI  &lt_to_ipad L_SETTING LANG2  &lt L_NUM SPACE  &lt_to_ipad L_ARROW LANG1      &kp BACKSPACE  &lt L_FUNCTION ENTER                               &kp DEL
+            >;
+
+            sensor-bindings = <&encoder_vol_down_up>;
+        };
+
+        IPHONE {
+            bindings = <
+&kp Q             &kp W         &kp E         &kp R                         &kp T                                                                 &kp Y        &kp U  &kp I               &kp O    &kp P
+&mt LEFT_GUI A    &kp S         &kp D         &kp F                         &kp G        &kp K_MUTE                                &kp MINUS      &kp H        &kp J  &kp K               &kp L    &kp SQT
+&mt LEFT_SHIFT Z  &kp X         &kp C         &kp V                         &kp B        &mo L_SETTING                             &kp SEMICOLON  &kp N        &kp M  &lt L_SCROLL COMMA  &kp DOT  &kp SLASH
+&kp LCTRL         &kp LEFT_ALT  &kp LEFT_GUI  &lt_to_iphone L_SETTING LANG2  &lt L_NUM SPACE  &lt_to_iphone L_ARROW LANG1      &kp BACKSPACE  &lt L_FUNCTION ENTER                               &kp DEL
+            >;
+
+            sensor-bindings = <&encoder_vol_down_up>;
+        };
+
+        IPAD_ARROW {
+            bindings = <
+&trans  &trans          &kp UP_ARROW    &trans           &trans                          &trans  &trans       &kp LG(H)      &trans          &trans
+&trans  &kp LEFT_ARROW  &kp DOWN_ARROW  &kp RIGHT_ARROW  &trans  &kp C_MUTE      &trans  &trans  &kp LG(TAB)  &kp LG(SPACE)  &kp LG(LS(N3))  &trans
+&trans  &trans          &trans          &trans           &trans  &trans          &trans  &trans  &trans       &trans         &trans          &trans
+&trans  &trans          &trans          &trans           &trans  &trans          &trans  &trans                                              &trans
+            >;
+
+            sensor-bindings = <&encoder_vol_down_up>;
+        };
+
+        IPHONE_ARROW {
+            bindings = <
+&trans  &trans          &kp UP_ARROW    &trans           &trans                          &trans  &trans       &kp LG(H)      &trans          &trans
+&trans  &kp LEFT_ARROW  &kp DOWN_ARROW  &kp RIGHT_ARROW  &trans  &kp C_MUTE      &trans  &trans  &kp LG(TAB)  &kp LG(SPACE)  &kp LG(LS(N3))  &trans
+&trans  &trans          &trans          &trans           &trans  &trans          &trans  &trans  &trans       &trans         &trans          &trans
+&trans  &trans          &trans          &trans           &trans  &trans          &trans  &trans                                              &trans
+            >;
+
+            sensor-bindings = <&encoder_vol_down_up>;
+        };
+
+        IPAD_MOUSE {
+            bindings = <
+&trans  &trans  &trans  &trans  &trans                      &trans  &none     &kp LG(TAB)  &kp LG(H)  &mt LG(LS(T)) LG(W)
+&trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans  &mkp MB1  &mkp MB3     &mkp MB2   &trans
+&trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans  &mkp MB4  &trans       &mkp MB5   &trans
+&trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans                                    &trans
+            >;
+        };
+
+        IPHONE_MOUSE {
+            bindings = <
+&trans  &trans  &trans  &trans  &trans                      &trans  &none     &kp LG(TAB)  &kp LG(H)  &mt LG(LS(T)) LG(W)
+&trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans  &mkp MB1  &mkp MB3     &mkp MB2   &trans
+&trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans  &mkp MB4  &trans       &mkp MB5   &trans
+&trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans                                    &trans
             >;
         };
     };
