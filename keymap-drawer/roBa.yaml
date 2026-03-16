@@ -88,6 +88,94 @@ layers:
   - BACKSPACE
   - {t: ENTER, h: FUNCTION}
   - DEL
+  IPAD:
+  - Q
+  - W
+  - E
+  - R
+  - T
+  - Y
+  - U
+  - I
+  - O
+  - P
+  - {t: A, h: LEFT GUI}
+  - S
+  - D
+  - F
+  - G
+  - MUTE
+  - '-'
+  - H
+  - J
+  - K
+  - L
+  - ''''
+  - {t: Z, h: LEFT SHIFT}
+  - X
+  - C
+  - V
+  - B
+  - SETTING
+  - ;
+  - N
+  - M
+  - {t: ',', h: SCROLL}
+  - .
+  - /
+  - LCTRL
+  - LEFT ALT
+  - LEFT GUI
+  - {t: '&to_ipad LANG2', h: SETTING}
+  - {t: SPACE, h: NUM}
+  - {t: '&to_ipad LANG1', h: ARROW}
+  - BACKSPACE
+  - {t: ENTER, h: FUNCTION}
+  - DEL
+  IPHONE:
+  - Q
+  - W
+  - E
+  - R
+  - T
+  - Y
+  - U
+  - I
+  - O
+  - P
+  - {t: A, h: LEFT GUI}
+  - S
+  - D
+  - F
+  - G
+  - MUTE
+  - '-'
+  - H
+  - J
+  - K
+  - L
+  - ''''
+  - {t: Z, h: LEFT SHIFT}
+  - X
+  - C
+  - V
+  - B
+  - SETTING
+  - ;
+  - N
+  - M
+  - {t: ',', h: SCROLL}
+  - .
+  - /
+  - LCTRL
+  - LEFT ALT
+  - LEFT GUI
+  - {t: '&to_iphone LANG2', h: SETTING}
+  - {t: SPACE, h: NUM}
+  - {t: '&to_iphone LANG1', h: ARROW}
+  - BACKSPACE
+  - {t: ENTER, h: FUNCTION}
+  - DEL
   FUNCTION:
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
@@ -396,98 +484,10 @@ layers:
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
-  IPAD:
-  - Q
-  - W
-  - E
-  - R
-  - T
-  - Y
-  - U
-  - I
-  - O
-  - P
-  - {t: A, h: LEFT GUI}
-  - S
-  - D
-  - F
-  - G
-  - MUTE
-  - '-'
-  - H
-  - J
-  - K
-  - L
-  - ''''
-  - {t: Z, h: LEFT SHIFT}
-  - X
-  - C
-  - V
-  - B
-  - SETTING
-  - ;
-  - N
-  - M
-  - {t: ',', h: SCROLL}
-  - .
-  - /
-  - LCTRL
-  - LEFT ALT
-  - LEFT GUI
-  - {t: '&to_ipad LANG2', h: SETTING}
-  - {t: SPACE, h: NUM}
-  - {t: '&to_ipad LANG1', h: ARROW}
-  - BACKSPACE
-  - {t: ENTER, h: FUNCTION}
-  - DEL
-  IPHONE:
-  - Q
-  - W
-  - E
-  - R
-  - T
-  - Y
-  - U
-  - I
-  - O
-  - P
-  - {t: A, h: LEFT GUI}
-  - S
-  - D
-  - F
-  - G
-  - MUTE
-  - '-'
-  - H
-  - J
-  - K
-  - L
-  - ''''
-  - {t: Z, h: LEFT SHIFT}
-  - X
-  - C
-  - V
-  - B
-  - SETTING
-  - ;
-  - N
-  - M
-  - {t: ',', h: SCROLL}
-  - .
-  - /
-  - LCTRL
-  - LEFT ALT
-  - LEFT GUI
-  - {t: '&to_iphone LANG2', h: SETTING}
-  - {t: SPACE, h: NUM}
-  - {t: '&to_iphone LANG1', h: ARROW}
-  - BACKSPACE
-  - {t: ENTER, h: FUNCTION}
-  - DEL
   IPAD_ARROW:
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
-  - UP ARROW
+  - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
@@ -496,11 +496,11 @@ layers:
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
-  - LEFT ARROW
-  - DOWN ARROW
-  - RIGHT ARROW
   - {t: ▽, type: trans}
-  - MUTE
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - Gui+TAB
@@ -531,7 +531,7 @@ layers:
   IPHONE_ARROW:
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
-  - UP ARROW
+  - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
@@ -540,11 +540,11 @@ layers:
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
-  - LEFT ARROW
-  - DOWN ARROW
-  - RIGHT ARROW
   - {t: ▽, type: trans}
-  - MUTE
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - Gui+TAB
@@ -591,9 +591,6 @@ layers:
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
-  - '&mkp MB1'
-  - '&mkp MB3'
-  - '&mkp MB2'
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
@@ -603,9 +600,12 @@ layers:
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
-  - '&mkp MB4'
   - {t: ▽, type: trans}
-  - '&mkp MB5'
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
@@ -635,9 +635,6 @@ layers:
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
-  - '&mkp MB1'
-  - '&mkp MB3'
-  - '&mkp MB2'
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
@@ -647,9 +644,12 @@ layers:
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
-  - '&mkp MB4'
   - {t: ▽, type: trans}
-  - '&mkp MB5'
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
