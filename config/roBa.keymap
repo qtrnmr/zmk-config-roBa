@@ -251,7 +251,7 @@
 &kp Q             &kp W         &kp E         &kp R                                 &kp T                                                                     &kp Y        &kp U  &kp I               &kp O    &kp P
 &mt LEFT_GUI A    &kp S         &kp D         &kp F                                 &kp G        &kp K_MUTE                                    &kp MINUS      &kp H        &kp J  &kp K               &kp L    &kp SQT
 &mt LEFT_SHIFT Z  &kp X         &kp C         &kp V                                 &kp B        &mo L_SETTING                                 &kp SEMICOLON  &kp N        &kp M  &lt L_SCROLL COMMA  &kp DOT  &kp SLASH
-&kp LCTRL         &kp LEFT_ALT  &kp LEFT_GUI  &lt_to_apple_default L_SETTING GLOBE  &lt L_NUM SPACE  &lt_to_apple_default L_ARROW GLOBE      &kp BACKSPACE  &lt L_FUNCTION ENTER                               &kp DEL
+&kp LCTRL         &kp LEFT_GUI  &kp LEFT_ALT  &lt_to_apple_default L_SETTING GLOBE  &lt L_NUM SPACE  &lt_to_apple_default L_ARROW GLOBE      &kp BACKSPACE  &lt L_FUNCTION ENTER                               &kp DEL
             >;
 
             sensor-bindings = <&encoder_vol_down_up>;
@@ -262,7 +262,7 @@
 &kp Q             &kp W         &kp E         &kp R                       &kp T                                                               &kp Y        &kp U  &kp I               &kp O    &kp P
 &mt LEFT_GUI A    &kp S         &kp D         &kp F                       &kp G        &kp K_MUTE                              &kp MINUS      &kp H        &kp J  &kp K               &kp L    &kp SQT
 &mt LEFT_SHIFT Z  &kp X         &kp C         &kp V                       &kp B        &mo L_SETTING                           &kp SEMICOLON  &kp N        &kp M  &lt L_SCROLL COMMA  &kp DOT  &kp SLASH
-&kp LCTRL         &kp LEFT_ALT  &kp LEFT_GUI  &lt_to_ipad L_SETTING LANG2  &lt L_NUM SPACE  &lt_to_ipad L_ARROW LANG1      &kp BACKSPACE  &lt L_FUNCTION ENTER                               &kp DEL
+&kp LCTRL         &kp LEFT_GUI  &kp LEFT_ALT  &lt_to_ipad L_SETTING LANG2  &lt L_NUM SPACE  &lt_to_ipad L_ARROW LANG1      &kp BACKSPACE  &lt L_FUNCTION ENTER                               &kp DEL
             >;
 
             sensor-bindings = <&encoder_vol_down_up>;
@@ -273,7 +273,7 @@
 &kp Q             &kp W         &kp E         &kp R                         &kp T                                                                 &kp Y        &kp U  &kp I               &kp O    &kp P
 &mt LEFT_GUI A    &kp S         &kp D         &kp F                         &kp G        &kp K_MUTE                                &kp MINUS      &kp H        &kp J  &kp K               &kp L    &kp SQT
 &mt LEFT_SHIFT Z  &kp X         &kp C         &kp V                         &kp B        &mo L_SETTING                             &kp SEMICOLON  &kp N        &kp M  &lt L_SCROLL COMMA  &kp DOT  &kp SLASH
-&kp LCTRL         &kp LEFT_ALT  &kp LEFT_GUI  &lt_to_iphone L_SETTING LANG2  &lt L_NUM SPACE  &lt_to_iphone L_ARROW LANG1      &kp BACKSPACE  &lt L_FUNCTION ENTER                               &kp DEL
+&kp LCTRL         &kp LEFT_GUI  &kp LEFT_ALT  &lt_to_iphone L_SETTING LANG2  &lt L_NUM SPACE  &lt_to_iphone L_ARROW LANG1      &kp BACKSPACE  &lt L_FUNCTION ENTER                               &kp DEL
             >;
 
             sensor-bindings = <&encoder_vol_down_up>;
@@ -328,7 +328,7 @@
 
         SETTING {
             bindings = <
-&bt BT_CLR  &trans  &trans  &trans  &trans                      &trans         &trans        &trans        &trans      &trans
+&bt BT_CLR  &trans  &trans  &trans  &trans                      &trans          &trans        &trans        &trans      &studio_unlock
 &trans      &trans  &trans  &trans  &trans  &trans      &trans  &bt_to_iphone  &bt_to_win0   &bt_to_win1   &bt_to_mac  &bt_to_ipad
 &trans      &trans  &trans  &trans  &trans  &trans      &trans  &trans         &trans        &trans        &trans      &trans
 &trans      &trans  &trans  &trans  &trans  &trans      &trans  &trans                                                 &trans

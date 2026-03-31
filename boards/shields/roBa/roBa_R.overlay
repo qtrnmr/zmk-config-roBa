@@ -1,4 +1,5 @@
 #include "roBa.dtsi"
+#include <input/processors/runtime-input-processor.dtsi>
 
 &default_transform {
     col-offset = <6>;
@@ -19,6 +20,7 @@
         status = "okay";
         compatible = "zmk,input-listener";
         device = <&trackball>;
+        input-processors = <&mouse_runtime_input_processor>;
     };
 };
 
