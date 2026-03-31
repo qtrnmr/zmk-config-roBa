@@ -80,8 +80,8 @@ layers:
   - .
   - /
   - LCTRL
-  - LEFT ALT
   - LEFT GUI
+  - LEFT ALT
   - {t: '&to_apple_default GLOBE', h: SETTING}
   - {t: SPACE, h: NUM}
   - {t: '&to_apple_default GLOBE', h: ARROW}
@@ -124,8 +124,8 @@ layers:
   - .
   - /
   - LCTRL
-  - LEFT ALT
   - LEFT GUI
+  - LEFT ALT
   - {t: '&to_ipad LANG2', h: SETTING}
   - {t: SPACE, h: NUM}
   - {t: '&to_ipad LANG1', h: ARROW}
@@ -168,8 +168,8 @@ layers:
   - .
   - /
   - LCTRL
-  - LEFT ALT
   - LEFT GUI
+  - LEFT ALT
   - {t: '&to_iphone LANG2', h: SETTING}
   - {t: SPACE, h: NUM}
   - {t: '&to_iphone LANG1', h: ARROW}
@@ -406,7 +406,7 @@ layers:
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
+  - '&studio_unlock'
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
