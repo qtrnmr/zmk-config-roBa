@@ -79,12 +79,12 @@ layers:
   - {t: ',', h: SCROLL}
   - .
   - /
-  - LCTRL
   - LEFT GUI
+  - LCTRL
   - LEFT ALT
-  - {t: '&to_apple_default GLOBE', h: SETTING}
+  - {t: '&to_apple_default LANG2', h: SETTING}
   - {t: SPACE, h: NUM}
-  - {t: '&to_apple_default GLOBE', h: ARROW}
+  - {t: '&to_apple_default LANG1', h: ARROW}
   - BACKSPACE
   - {t: ENTER, h: FUNCTION}
   - DEL
@@ -123,8 +123,8 @@ layers:
   - {t: ',', h: SCROLL}
   - .
   - /
-  - LCTRL
   - LEFT GUI
+  - LCTRL
   - LEFT ALT
   - {t: '&to_ipad LANG2', h: SETTING}
   - {t: SPACE, h: NUM}
@@ -167,8 +167,8 @@ layers:
   - {t: ',', h: SCROLL}
   - .
   - /
-  - LCTRL
   - LEFT GUI
+  - LCTRL
   - LEFT ALT
   - {t: '&to_iphone LANG2', h: SETTING}
   - {t: SPACE, h: NUM}
