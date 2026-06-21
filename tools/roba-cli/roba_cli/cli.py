@@ -9,6 +9,7 @@ from pathlib import Path
 from . import behaviors
 from . import connection
 from . import macro_dsl
+from .keymap_client import KeymapClient
 
 
 def _emit(obj: dict) -> None:
@@ -103,6 +104,74 @@ def cmd_info(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_layer_list(args: argparse.Namespace) -> int:
+    with KeymapClient(args.port) as client:
+        layers = client.get_layers()
+    _emit({"layers": layers})
+    return 0
+
+
+def _backup_layers(client) -> None:
+    """Snapshot current layers before a mutating op (for revert audit trail)."""
+    try:
+        layers = client.get_layers()
+    except Exception:  # noqa: BLE001
+        layers = None
+    _append_backup({"op": "layer_mutate", "before_layers": layers})
+
+
+def cmd_layer_rename(args: argparse.Namespace) -> int:
+    with KeymapClient(args.port) as client:
+        _backup_layers(client)
+        res = client.rename(args.layer_id, args.name)
+        if res["ok"]:
+            res.update(client.save())
+    _emit({"op": "rename", "layer_id": args.layer_id, "name": args.name, **res})
+    return 0 if res["ok"] else 1
+
+
+def cmd_layer_add(args: argparse.Namespace) -> int:
+    with KeymapClient(args.port) as client:
+        _backup_layers(client)
+        res = client.add()
+        if res["ok"]:
+            save = client.save()
+            res["ok"] = save["ok"]
+            res.setdefault("error", save["error"])
+    _emit({"op": "add", **res})
+    return 0 if res["ok"] else 1
+
+
+def cmd_layer_remove(args: argparse.Namespace) -> int:
+    with KeymapClient(args.port) as client:
+        _backup_layers(client)
+        res = client.remove(args.index)
+        if res["ok"]:
+            res = client.save()
+    _emit({"op": "remove", "index": args.index, **res})
+    return 0 if res["ok"] else 1
+
+
+def cmd_layer_move(args: argparse.Namespace) -> int:
+    with KeymapClient(args.port) as client:
+        _backup_layers(client)
+        res = client.move(args.start, args.dest)
+        if res["ok"]:
+            res = client.save()
+    _emit({"op": "move", "start": args.start, "dest": args.dest, **res})
+    return 0 if res["ok"] else 1
+
+
+def cmd_layer_restore(args: argparse.Namespace) -> int:
+    with KeymapClient(args.port) as client:
+        _backup_layers(client)
+        res = client.restore(args.layer_id, args.at_index)
+        if res["ok"]:
+            res = client.save()
+    _emit({"op": "restore", "layer_id": args.layer_id, "at_index": args.at_index, **res})
+    return 0 if res["ok"] else 1
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="roba")
     parser.add_argument("--port", default=None,
@@ -128,6 +197,26 @@ def build_parser() -> argparse.ArgumentParser:
     ms_p.add_argument("slot", type=int)
     ms_p.add_argument("dsl", help='e.g. "type hello | wait 50 | C-c"')
     ms_p.set_defaults(func=cmd_macro_set)
+    layer = sub.add_parser("layer", help="Layer management (Studio native)").add_subparsers(
+        dest="layer_cmd", required=True)
+    layer.add_parser("list", help="List layers as JSON").set_defaults(func=cmd_layer_list)
+    lr = layer.add_parser("rename", help="Rename a layer by id")
+    lr.add_argument("layer_id", type=int)
+    lr.add_argument("name")
+    lr.set_defaults(func=cmd_layer_rename)
+    layer.add_parser("add", help="Add a layer (devicetree-defined free slot)").set_defaults(
+        func=cmd_layer_add)
+    lrm = layer.add_parser("remove", help="Remove a layer by index")
+    lrm.add_argument("index", type=int)
+    lrm.set_defaults(func=cmd_layer_remove)
+    lm = layer.add_parser("move", help="Move a layer from start index to dest index")
+    lm.add_argument("start", type=int)
+    lm.add_argument("dest", type=int)
+    lm.set_defaults(func=cmd_layer_move)
+    lrs = layer.add_parser("restore", help="Restore a removed layer by id at index")
+    lrs.add_argument("layer_id", type=int)
+    lrs.add_argument("at_index", type=int)
+    lrs.set_defaults(func=cmd_layer_restore)
     sub.add_parser("reset", help="Revert nvs to devicetree defaults").set_defaults(func=cmd_reset)
     snap = sub.add_parser("snapshot", help="Save raw keymap bytes for record")
     snap.add_argument("path", nargs="?", default=None)

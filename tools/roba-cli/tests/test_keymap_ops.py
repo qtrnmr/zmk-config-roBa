@@ -5,6 +5,7 @@ import studio_pb2
 import keymap_pb2
 
 from roba_cli import keymap_client as kc
+from roba_cli import cli as _cli
 
 
 def test_req_get_keymap_wraps_in_studio_request():
@@ -89,3 +90,13 @@ def test_decode_status_empty_response_raises():
     resp = keymap_pb2.Response()
     with pytest.raises(ValueError, match="empty keymap response"):
         kc.decode_status(resp)
+
+
+def test_layer_subcommands_parse():
+    p = _cli.build_parser()
+    ns = p.parse_args(["layer", "rename", "9", "GAME"])
+    assert ns.layer_id == 9 and ns.name == "GAME"
+    ns2 = p.parse_args(["layer", "move", "2", "5"])
+    assert ns2.start == 2 and ns2.dest == 5
+    ns3 = p.parse_args(["layer", "list"])
+    assert ns3.func is _cli.cmd_layer_list
