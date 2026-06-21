@@ -47,10 +47,15 @@ spec→plan→実装を回す。
 
 - 変更前に必ず現状を退避する（SP0: `keymap dump` の JSON スナップショット / ファーム変更を伴う SP: known-good `.uf2` を保管）。
 - 破壊的操作は必ず可逆操作とセットで実装・提示する（「変更」を出すなら「戻す」も同時に）。
-- 復元の段階的フォールバック:
-  1. CLI `restore`（直前変更を戻す）
-  2. CLI `reset`（runtime 変更を全消去＝devicetree 既定へ）
-  3. 最終手段 `settings_reset` uf2 で nvs 初期化（`build.yaml` に定義済み。リセット ダブルタップ→書込は物理操作が必要）
+- 復元の段階的フォールバック（`zmk-studio-api` の実 API に基づく）:
+  1. CLI `reset` = `client.reset_settings()`。**ワイヤ越しに nvs を devicetree 既定へ全戻し**。
+     現在 flash されているファームの keymap が「known-good」基準であり、これで確実にそこへ戻る。物理操作不要。**これが第一の安全網**。
+  2. `discard_changes()` で**保存前(unsaved)の変更を破棄**（`save_changes()` 前なら即取消）。
+  3. 最終手段 `settings_reset` uf2 で nvs 初期化（`build.yaml` に定義済み。リセット ダブルタップ→書込は物理操作）。
+- **API 制約（重要）**: `get_key_at` の戻り `Behavior` は `.kind` と `__repr__` しか公開せず、任意 behavior を
+  (behavior_id, param1, param2) へ落とす getter が無い。`set_keymap_bytes` も存在しない。よって
+  「スナップショットからの全体ピンポイント復元」は API 的に不可。`snapshot`（= `get_keymap_bytes()` の生バイト保存）は
+  **記録・差分確認用**と位置づけ、確実な全戻しは上記 1（`reset_settings`）で担保する。
 
 ## 3. SP0 スコープ
 
@@ -70,8 +75,15 @@ spec→plan→実装を回す。
 - ZMK Studio 転送は BLE(GATT) と USB serial(CDC-ACM) の2系統。**本ファームは BLE のみ有効**
   （`roBa_R.conf`: `CONFIG_ZMK_STUDIO_TRANSPORT_BLE=y` / コミット `drop studio-rpc-usb-uart` で USB 側は除外）。
 - **ロック解除不要**: `roBa_R.conf` が `CONFIG_ZMK_STUDIO_LOCKING=n`。`&studio_unlock` の儀式は省略可。
-- 流用クライアント: **`srwi/zmk-studio-api`**（Rust + Python, Serial + BLE 両対応, keymap 読取・変更）。
-  protobuf スキーマは `zmkfirmware/zmk-studio-messages`（`studio.proto` → `core/behaviors/keymap.proto`）。
+- 流用クライアント: **`srwi/zmk-studio-api`**（PyPI `zmk-studio-api==0.3.1`, Serial + BLE）。確定 Python API:
+  `StudioClient.list_ble_devices() -> [(device_id, local_name)]` / `StudioClient.open_ble(device_id)` /
+  `get_lock_state()` / `list_all_behaviors()` / `get_keymap_bytes()` / `get_device_info_bytes()` /
+  `get_key_at(layer, pos) -> Behavior(.kind, __repr__)` / `set_key_at(layer, pos, Behavior)` /
+  `check_unsaved_changes()` / `save_changes()` / `discard_changes()` / **`reset_settings()`**。
+  behavior 構築子: `KeyPress(Keycode.X)`, `MomentaryLayer(id)`, `MouseKeyPress(v)`, `Transparent()`, `Raw(behavior_id, p1, p2)`。
+- **BLE wheel リスク**: PyPI の wheel が `--features ble` 無しでビルドされていると `open_ble`/`list_ble_devices` が
+  「BLE not enabled」で失敗するスタブになる可能性。SP0 Task1 のスパイクで実機検証し、ダメなら maturin で
+  `--features ble` ビルド or 公式 TS クライアントへ切替。
 - BLE デバイス: 名前 `roBa` / アドレス `F8:9A:A2:21:64:D4` / VID `0x1D50` / PID `0x615E`。
 
 ## 5. コンポーネント
@@ -80,10 +92,10 @@ spec→plan→実装を回す。
 - CLI 動詞（最小）:
   - `roba info` — デバイス情報・レイヤー一覧を JSON 出力
   - `roba keymap dump` — 現キーマップを JSON 取得
-  - `roba key set <layer> <pos> <behavior>` — キー1個を変更
-  - `roba snapshot [path]` — 現キーマップを known-good として保存（変更前に自動でも取る）
-  - `roba restore [path]` — スナップショット（既定: 直近）へ全体復元
-  - `roba reset` — runtime 変更を全消去し devicetree 既定へ戻す
+  - `roba key get <layer> <pos>` — 指定キーの現 behavior（`.kind` + `__repr__`）を JSON 出力
+  - `roba key set <layer> <pos> <behavior>` — キー1個を変更（変更前 behavior を backup ログに記録 → `save_changes()`）
+  - `roba snapshot [path]` — 現キーマップ生バイト（`get_keymap_bytes()`）を記録用に保存
+  - `roba reset` — `reset_settings()` で nvs を devicetree 既定へ全戻し（第一の安全網）
 - 出力は**機械可読(JSON)**。Claude Code がパースして次手を判断できる形にする。
 
 ## 6. データフロー
@@ -116,9 +128,9 @@ Claude Code → roba-cli(コマンド) → zmk-studio-api → BLE GATT → roBa
 ## 10. 完了条件（SP0 Definition of Done）
 
 - `roba info` と `roba keymap dump` が実機 roBa に対し JSON を返す。
-- `roba key set` → `dump` で反映確認 → `restore` で復元、が一連で通る。
-- 変更が再起動後も保持される（nvs 永続化の確認）。
-- `roba snapshot`/`restore`/`reset` で known-good へ確実に戻せる（§2.5 の要件充足）。
+- `roba key set` → `key get` で反映確認 → `reset` で devicetree 既定へ戻る、が一連で通る。
+- 変更が `save_changes()` 後に再起動を跨いで保持される（nvs 永続化の確認）。
+- `roba reset`（= `reset_settings()`）で known-good（flash 済みファームの既定 keymap）へ確実に戻せる（§2.5 の要件充足）。
 
 ## 11. リスクと留意点
 
