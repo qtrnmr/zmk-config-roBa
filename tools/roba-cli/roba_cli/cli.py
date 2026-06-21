@@ -46,6 +46,24 @@ def cmd_key_set(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_reset(args: argparse.Namespace) -> int:
+    client = connection.open(args.port)
+    ok = client.reset_settings()
+    _emit({"reset_settings": ok, "note": "nvs reverted to devicetree defaults"})
+    return 0
+
+
+def cmd_snapshot(args: argparse.Namespace) -> int:
+    client = connection.open(args.port)
+    data = client.get_keymap_bytes()
+    out = Path(args.path) if args.path else (
+        BACKUP_LOG.parent / f"keymap-snapshot-{_dt.datetime.now():%Y%m%d-%H%M%S}.bin")
+    out.write_bytes(data)
+    _emit({"snapshot": str(out), "bytes": len(data),
+           "note": "record only; full restore is via 'reset' (no set_keymap_bytes API)"})
+    return 0
+
+
 def cmd_info(args: argparse.Namespace) -> int:
     client = connection.open(args.port)
     _emit({
@@ -72,6 +90,10 @@ def build_parser() -> argparse.ArgumentParser:
     ks.add_argument("position", type=int)
     ks.add_argument("behavior", help="e.g. 'KP B', 'trans', 'MO 5'")
     ks.set_defaults(func=cmd_key_set)
+    sub.add_parser("reset", help="Revert nvs to devicetree defaults").set_defaults(func=cmd_reset)
+    snap = sub.add_parser("snapshot", help="Save raw keymap bytes for record")
+    snap.add_argument("path", nargs="?", default=None)
+    snap.set_defaults(func=cmd_snapshot)
     return parser
 
 
