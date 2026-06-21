@@ -148,6 +148,11 @@
     };
 
     behaviors {
+        rt_macro: rt_macro {
+            compatible = "zmk,behavior-runtime-macro";
+            #binding-cells = <1>;
+        };
+
         lt_to_layer_0: lt_to_layer_0 {
             compatible = "zmk,behavior-hold-tap";
             label = "LAYER_TAP_TO_0";
@@ -330,7 +335,7 @@
             bindings = <
 &bt BT_CLR  &trans  &trans  &trans  &trans                      &trans          &trans        &trans        &trans      &studio_unlock
 &trans      &trans  &trans  &trans  &trans  &trans      &trans  &bt_to_iphone  &bt_to_win0   &bt_to_win1   &bt_to_mac  &bt_to_ipad
-&trans      &trans  &trans  &trans  &trans  &trans      &trans  &trans         &trans        &trans        &trans      &trans
+&rt_macro 0  &trans  &trans  &trans  &trans  &trans      &trans  &trans         &trans        &trans        &trans      &trans
 &trans      &trans  &trans  &trans  &trans  &trans      &trans  &trans                                                 &trans
             >;
         };
