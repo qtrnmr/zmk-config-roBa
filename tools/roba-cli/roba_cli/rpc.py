@@ -62,19 +62,55 @@ def read_frame(ser: "serial.Serial", timeout: float = READ_TIMEOUT) -> bytes:
     )
 
 
+def _extract_frame(buf: bytearray):
+    """Extract the first complete SOF..EOF frame from buf.
+
+    Returns (frame_bytes_including_SOF_EOF, remainder_buffer) or
+    (None, kept_buffer) when no complete frame is present yet. ESC is honored
+    so an escaped EOF/SOF inside the payload is not treated as a boundary.
+    Leading noise before the first SOF is dropped.
+    """
+    start = buf.find(SOF)
+    if start == -1:
+        return None, bytearray()
+    i = start + 1
+    escaped = False
+    while i < len(buf):
+        b = buf[i]
+        if escaped:
+            escaped = False
+        elif b == ESC:
+            escaped = True
+        elif b == EOF:
+            return bytes(buf[start:i + 1]), bytearray(buf[i + 1:])
+        i += 1
+    return None, bytearray(buf[start:])
+
+
 def send_recv(ser: "serial.Serial", studio_req: "studio_pb2.Request",
               timeout: float = READ_TIMEOUT) -> "studio_pb2.Response":
-    payload = studio_req.SerializeToString()
-    ser.write(encode_frame(payload))
+    """Send a framed request; return the first request_response Response.
+
+    Buffers bytes across reads so that a notification frame arriving in the
+    same burst as the request_response does not cause the response to be lost.
+    Notification frames are discarded; the loop keeps extracting from the
+    buffer (which may already hold the response) before reading more.
+    """
+    ser.write(encode_frame(studio_req.SerializeToString()))
     ser.flush()
+    buf = bytearray()
     deadline = time.monotonic() + timeout
     while True:
+        frame, buf = _extract_frame(buf)
+        if frame is not None:
+            resp = studio_pb2.Response()
+            resp.ParseFromString(decode_frame(frame))
+            if resp.HasField("request_response"):
+                return resp
+            continue  # notification frame; keep extracting from the buffer
         remaining = deadline - time.monotonic()
         if remaining <= 0:
             raise TimeoutError("Timed out waiting for request_response frame")
-        raw_frame = read_frame(ser, timeout=remaining)
-        resp = studio_pb2.Response()
-        resp.ParseFromString(decode_frame(raw_frame))
-        if resp.HasField("request_response"):
-            return resp
-        # notification frame; discard and keep waiting
+        chunk = ser.read(CHUNK)
+        if chunk:
+            buf += chunk
