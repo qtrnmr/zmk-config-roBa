@@ -66,17 +66,29 @@ def _read_frame(ser: serial.Serial, timeout: float = _READ_TIMEOUT) -> bytes:
     raise TimeoutError(f"Timed out waiting for frame (got {len(buf)} bytes so far: {buf.hex()})")
 
 
-def _send_recv(ser: serial.Serial, studio_req: studio_pb2.Request) -> studio_pb2.Response:
-    """Serialize, frame, write; read one frame back and parse studio.Response."""
+def _send_recv(ser: serial.Serial, studio_req: studio_pb2.Request, timeout: float = _READ_TIMEOUT) -> studio_pb2.Response:
+    """Serialize, frame, write; loop reading frames until request_response is received.
+
+    Notification frames emitted by the firmware before the RequestResponse are
+    discarded.  The overall deadline covers the entire loop so that the caller's
+    timeout semantics are preserved.
+    """
     payload = studio_req.SerializeToString()
     ser.write(encode_frame(payload))
     ser.flush()
 
-    raw_frame = _read_frame(ser)
-    payload_back = decode_frame(raw_frame)
-    resp = studio_pb2.Response()
-    resp.ParseFromString(payload_back)
-    return resp
+    deadline = time.monotonic() + timeout
+    while True:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise TimeoutError("Timed out waiting for request_response frame")
+        raw_frame = _read_frame(ser, timeout=remaining)
+        payload_back = decode_frame(raw_frame)
+        resp = studio_pb2.Response()
+        resp.ParseFromString(payload_back)
+        if resp.HasField("request_response"):
+            return resp
+        # Frame was a notification; discard and keep waiting.
 
 
 class MacroClient:
