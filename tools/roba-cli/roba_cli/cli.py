@@ -41,8 +41,10 @@ def cmd_key_set(args: argparse.Namespace) -> int:
     spec = behaviors.parse_behavior(args.behavior)
     client.set_key_at(args.layer, args.position, behaviors.build_behavior(spec, zmk))
     client.save_changes()
+    after = client.get_key_at(args.layer, args.position)
     _emit({"layer": args.layer, "position": args.position,
-           "before": repr(before), "after_spec": args.behavior, "saved": True})
+           "before": repr(before), "after_spec": args.behavior,
+           "after_kind": after.kind, "after_repr": repr(after), "saved": True})
     return 0
 
 

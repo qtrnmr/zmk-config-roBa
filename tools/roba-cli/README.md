@@ -1,10 +1,14 @@
 # roba-cli (SP0)
 
-roBa を BLE 経由で焼かずに設定変更する CLI。
+roBa を USB シリアル経由で焼かずに設定変更する CLI。
 
 ## セットアップ
     python3 -m venv .venv && . .venv/bin/activate
     pip install -e .
+    # zmk-studio-api は PyPI 0.3.1 では macOS で serial/BLE が無効。
+    # 動作確認済みは source ビルド(0.4.0系, serial+ble feature):
+    pip install maturin
+    pip install "git+https://github.com/srwi/zmk-studio-api.git" --config-settings=build-args="--features python,serial,ble"
 
 ## コマンド
 - `roba info` — デバイス/ロック/keymap サマリ
