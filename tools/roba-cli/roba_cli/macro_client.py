@@ -9,93 +9,20 @@ Wire format: ZMK Studio serial framing (SOF=0xAB, ESC=0xAC, EOF=0xAD, no XOR).
 
 from __future__ import annotations
 
-import glob
-import time
 import serial
 
 import roba_cli.proto  # sets sys.path for proto imports
 import studio_pb2
 import custom_pb2
 from roba_cli.proto.macros import macros_pb2
-from .framing import encode_frame, decode_frame
-
-SOF = 0xAB
-EOF = 0xAD
-
-PORT_GLOB = "/dev/cu.usbmodem*"
-_DEFAULT_BAUD = 115200
-_READ_TIMEOUT = 2.0   # seconds per read loop
-_CHUNK = 256
-
-
-def _find_port() -> str:
-    ports = sorted(glob.glob(PORT_GLOB))
-    if len(ports) == 1:
-        return ports[0]
-    raise RuntimeError(
-        f"roBa serial port not uniquely found. candidates={ports}. "
-        "Pass --port explicitly."
-    )
-
-
-def _read_frame(ser: serial.Serial, timeout: float = _READ_TIMEOUT) -> bytes:
-    """Read bytes from serial until a complete SOF…EOF frame is received."""
-    buf = bytearray()
-    in_frame = False
-    deadline = time.monotonic() + timeout
-    escaped = False
-
-    while time.monotonic() < deadline:
-        chunk = ser.read(_CHUNK)
-        if not chunk:
-            continue
-        for b in chunk:
-            if not in_frame:
-                if b == SOF:
-                    buf = bytearray([b])
-                    in_frame = True
-                    escaped = False
-            else:
-                buf.append(b)
-                if escaped:
-                    escaped = False
-                elif b == 0xAC:  # ESC
-                    escaped = True
-                elif b == EOF:
-                    return bytes(buf)
-    raise TimeoutError(f"Timed out waiting for frame (got {len(buf)} bytes so far: {buf.hex()})")
-
-
-def _send_recv(ser: serial.Serial, studio_req: studio_pb2.Request, timeout: float = _READ_TIMEOUT) -> studio_pb2.Response:
-    """Serialize, frame, write; loop reading frames until request_response is received.
-
-    Notification frames emitted by the firmware before the RequestResponse are
-    discarded.  The overall deadline covers the entire loop so that the caller's
-    timeout semantics are preserved.
-    """
-    payload = studio_req.SerializeToString()
-    ser.write(encode_frame(payload))
-    ser.flush()
-
-    deadline = time.monotonic() + timeout
-    while True:
-        remaining = deadline - time.monotonic()
-        if remaining <= 0:
-            raise TimeoutError("Timed out waiting for request_response frame")
-        raw_frame = _read_frame(ser, timeout=remaining)
-        payload_back = decode_frame(raw_frame)
-        resp = studio_pb2.Response()
-        resp.ParseFromString(payload_back)
-        if resp.HasField("request_response"):
-            return resp
-        # Frame was a notification; discard and keep waiting.
+from . import rpc
 
 
 class MacroClient:
     """Open the serial port and perform macro get/set over the custom-envelope RPC."""
 
-    def __init__(self, port: str | None = None, baud: int = _DEFAULT_BAUD):
-        target = port or _find_port()
+    def __init__(self, port: str | None = None, baud: int = rpc.DEFAULT_BAUD):
+        target = port or rpc.find_port()
         self._ser = serial.Serial(target, baud, timeout=0.1)
         self._subsystem_index: int | None = None
 
@@ -121,7 +48,7 @@ class MacroClient:
         req.request_id = 1
         req.custom.list_custom_subsystems.CopyFrom(custom_pb2.ListCustomSubsystemRequest())
 
-        resp = _send_recv(self._ser, req)
+        resp = rpc.send_recv(self._ser, req)
 
         rr = resp.request_response
         css_resp = rr.custom.list_custom_subsystems
@@ -145,7 +72,7 @@ class MacroClient:
         call_req.subsystem_index = idx
         call_req.payload = macro_req.SerializeToString()
 
-        resp = _send_recv(self._ser, studio_req)
+        resp = rpc.send_recv(self._ser, studio_req)
 
         call_resp = resp.request_response.custom.call
         macro_resp = macros_pb2.Response()
