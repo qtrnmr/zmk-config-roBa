@@ -71,7 +71,7 @@ def cmd_macro_set(args: argparse.Namespace) -> int:
         result = client.set_macro(args.slot, steps)
     _emit({"slot": args.slot, "steps": len(steps), "ok": result.get("ok", False),
            "error": result.get("error") or None})
-    return 0
+    return 0 if result.get("ok") else 1
 
 
 def cmd_reset(args: argparse.Namespace) -> int:

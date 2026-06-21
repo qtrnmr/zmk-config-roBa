@@ -38,6 +38,8 @@ _MOD_BITS = {
 
 _LSHIFT_BIT = 2 << 24
 
+MAX_STEPS = 32
+
 
 def _make_step(keycode: int, wait_ms: int = 0, tap_ms: int = 0) -> dict:
     return {"type": 0, "keycode": keycode, "wait_ms": wait_ms, "tap_ms": tap_ms}
@@ -104,5 +106,8 @@ def parse(s: str) -> list[dict]:
 
         else:
             raise ValueError(f"Unknown DSL token: {head!r}")
+
+    if len(steps) > MAX_STEPS:
+        raise ValueError(f"macro has {len(steps)} steps; max is {MAX_STEPS}")
 
     return steps

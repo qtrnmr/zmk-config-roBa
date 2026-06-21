@@ -20,3 +20,9 @@ def test_wait_attaches_to_prev():
 def test_unknown_token_raises():
     with pytest.raises(ValueError):
         parse("frobnicate x")
+
+
+def test_too_many_steps_raises():
+    # "type " + 33 identical characters produces 33 steps, exceeding MAX_STEPS=32
+    with pytest.raises(ValueError, match="max is 32"):
+        parse("type " + "a" * 33)
