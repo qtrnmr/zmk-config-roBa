@@ -12,7 +12,7 @@ def _emit(obj: dict) -> None:
 
 
 def cmd_info(args: argparse.Namespace) -> int:
-    client = connection.open(args.device)
+    client = connection.open(args.port)
     _emit({
         "lock_state": client.get_lock_state(),
         "behavior_count": len(client.list_all_behaviors()),
@@ -23,7 +23,8 @@ def cmd_info(args: argparse.Namespace) -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="roba")
-    parser.add_argument("--device", default=None, help="BLE device id (default: auto-detect roBa)")
+    parser.add_argument("--port", default=None,
+                        help="roBa USB serial port (default: auto-detect /dev/cu.usbmodem*)")
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("info", help="Show device/lock/keymap summary").set_defaults(func=cmd_info)
     return parser

@@ -1,21 +1,29 @@
 from __future__ import annotations
 
+import glob
+
 import zmk_studio_api as zmk
 
-ROBA_NAME = "roBa"
+# roBa central exposes a USB CDC-ACM serial port when built with the
+# studio-rpc-usb-uart snippet. On macOS these enumerate as /dev/cu.usbmodem*.
+PORT_GLOB = "/dev/cu.usbmodem*"
 
 
-def find_roba_device_id() -> str | None:
-    """ペア済み BLE から roBa の device_id を返す。無ければ None。"""
-    for device_id, local_name in zmk.StudioClient.list_ble_devices():
-        if (local_name or "") == ROBA_NAME:
-            return device_id
+def find_roba_port() -> str | None:
+    """roBa の USB CDC-ACM ポートを返す。候補が一意でなければ None。"""
+    ports = sorted(glob.glob(PORT_GLOB))
+    if len(ports) == 1:
+        return ports[0]
     return None
 
 
-def open(device_id: str | None = None) -> "zmk.StudioClient":
-    """roBa に BLE 接続した StudioClient を返す。"""
-    target = device_id or find_roba_device_id()
+def open(port: str | None = None) -> "zmk.StudioClient":
+    """roBa に USB serial 接続した StudioClient を返す。"""
+    target = port or find_roba_port()
     if target is None:
-        raise RuntimeError("roBa not found over BLE. Pair/connect the keyboard first.")
-    return zmk.StudioClient.open_ble(target)
+        candidates = sorted(glob.glob(PORT_GLOB))
+        raise RuntimeError(
+            "roBa serial port not uniquely found. "
+            f"candidates={candidates}. Pass --port explicitly."
+        )
+    return zmk.StudioClient.open_serial(target)
