@@ -1,0 +1,2 @@
+{"op": "set", "layer": 0, "position": 0, "before_kind": "KeyPress", "before_repr": "Behavior(KeyPress(HidUsage { page: 7, id: 20, modifiers: 0 }))", "new": "KP B", "ts": "2026-06-21T16:42:17"}
+{"op": "set", "layer": 0, "position": 0, "before_kind": "KeyPress", "before_repr": "Behavior(KeyPress(HidUsage { page: 7, id: 5, modifiers: 0 }))", "new": "KP Q", "ts": "2026-06-21T16:42:24"}
