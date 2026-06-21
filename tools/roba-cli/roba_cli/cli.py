@@ -8,6 +8,7 @@ from pathlib import Path
 
 from . import behaviors
 from . import connection
+from . import macro_dsl
 
 
 def _emit(obj: dict) -> None:
@@ -45,6 +46,31 @@ def cmd_key_set(args: argparse.Namespace) -> int:
     _emit({"layer": args.layer, "position": args.position,
            "before": repr(before), "after_spec": args.behavior,
            "after_kind": after.kind, "after_repr": repr(after), "saved": True})
+    return 0
+
+
+def cmd_macro_get(args: argparse.Namespace) -> int:
+    from .macro_client import MacroClient
+    with MacroClient(args.port) as client:
+        steps = client.get_macro(args.slot)
+    _emit(steps)
+    return 0
+
+
+def cmd_macro_set(args: argparse.Namespace) -> int:
+    from .macro_client import MacroClient
+    steps = macro_dsl.parse(args.dsl)
+    # backup: read current state first
+    with MacroClient(args.port) as client:
+        try:
+            before = client.get_macro(args.slot)
+        except Exception:  # noqa: BLE001
+            before = []
+        _append_backup({"op": "macro_set", "slot": args.slot,
+                        "before_steps": before, "new_dsl": args.dsl})
+        result = client.set_macro(args.slot, steps)
+    _emit({"slot": args.slot, "steps": len(steps), "ok": result.get("ok", False),
+           "error": result.get("error") or None})
     return 0
 
 
@@ -93,6 +119,15 @@ def build_parser() -> argparse.ArgumentParser:
     ks.add_argument("position", type=int)
     ks.add_argument("behavior", help="e.g. 'KP B', 'trans', 'MO 5'")
     ks.set_defaults(func=cmd_key_set)
+    macro = sub.add_parser("macro", help="Runtime macro get/set").add_subparsers(
+        dest="macro_cmd", required=True)
+    mg = macro.add_parser("get", help="Get macro steps as JSON")
+    mg.add_argument("slot", type=int)
+    mg.set_defaults(func=cmd_macro_get)
+    ms_p = macro.add_parser("set", help="Set macro from DSL string")
+    ms_p.add_argument("slot", type=int)
+    ms_p.add_argument("dsl", help='e.g. "type hello | wait 50 | C-c"')
+    ms_p.set_defaults(func=cmd_macro_set)
     sub.add_parser("reset", help="Revert nvs to devicetree defaults").set_defaults(func=cmd_reset)
     snap = sub.add_parser("snapshot", help="Save raw keymap bytes for record")
     snap.add_argument("path", nargs="?", default=None)

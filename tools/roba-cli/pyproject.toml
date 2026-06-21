@@ -12,6 +12,9 @@ roba = "roba_cli.cli:run"
 [project.optional-dependencies]
 dev = ["pytest"]
 
+[tool.setuptools.packages.find]
+include = ["roba_cli*"]
+
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
