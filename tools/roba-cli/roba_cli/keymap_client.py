@@ -85,6 +85,9 @@ _ENUM_NAME = {
 def decode_status(km_resp: "keymap_pb2.Response") -> dict:
     """Normalize any keymap.Response variant to {ok, error[, index]}."""
     which = km_resp.WhichOneof("response_type")
+    # Guard: empty response (no response_type set)
+    if which is None:
+        raise ValueError("empty keymap response (no response_type set)")
     # Scalar enum responses (ok == 0)
     if which in _ENUM_NAME:
         val = getattr(km_resp, which)
@@ -101,6 +104,9 @@ def decode_status(km_resp: "keymap_pb2.Response") -> dict:
         enum_val = sub.err
         enum_desc = sub.DESCRIPTOR.fields_by_name["err"].enum_type
         return {"ok": False, "error": enum_desc.values_by_number[enum_val].name}
+    # Guard: save_changes with ok=False (ok is a bool, not a message)
+    if which == "save_changes" and not sub.ok:
+        return {"ok": False, "error": "SAVE_CHANGES_ERR_GENERIC"}
     out = {"ok": True, "error": ""}
     if which == "add_layer":
         out["index"] = sub.ok.index

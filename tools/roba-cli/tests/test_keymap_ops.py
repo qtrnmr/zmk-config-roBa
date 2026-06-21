@@ -1,3 +1,5 @@
+import pytest
+
 import roba_cli.proto  # noqa: F401  sets sys.path
 import studio_pb2
 import keymap_pb2
@@ -72,3 +74,18 @@ def test_decode_status_save_changes_err():
     resp.save_changes.err = keymap_pb2.SAVE_CHANGES_ERR_NO_SPACE
     d = kc.decode_status(resp)
     assert d["ok"] is False and "NO_SPACE" in d["error"]
+
+
+def test_decode_status_save_changes_ok_false():
+    """save_changes.ok is a bool; False should report failure."""
+    resp = keymap_pb2.Response()
+    resp.save_changes.ok = False
+    d = kc.decode_status(resp)
+    assert d["ok"] is False and d["error"] == "SAVE_CHANGES_ERR_GENERIC"
+
+
+def test_decode_status_empty_response_raises():
+    """Empty Response (no response_type set) should raise ValueError."""
+    resp = keymap_pb2.Response()
+    with pytest.raises(ValueError, match="empty keymap response"):
+        kc.decode_status(resp)
