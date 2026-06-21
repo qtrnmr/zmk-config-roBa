@@ -6,3 +6,5 @@ dist/
 build/
 # runtime backup log of live key changes — not source
 .roba-backup.jsonl
+# keymap snapshots (record-only runtime artifacts)
+keymap-snapshot-*.bin
