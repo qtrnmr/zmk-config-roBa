@@ -419,7 +419,7 @@ layers:
   - '&bt_to_win1'
   - '&bt_to_mac'
   - '&bt_to_ipad'
-  - {t: ▽, type: trans}
+  - '&rt_macro'
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}

@@ -4,6 +4,8 @@ manifest:
       url-base: https://github.com/cormoran
     - name: kumamuk-git
       url-base: https://github.com/kumamuk-git
+    - name: qtrnmr-gh
+      url-base: https://github.com/qtrnmr
   projects:
     - name: zmk
       remote: cormoran
@@ -23,6 +25,9 @@ manifest:
       revision: main
     - name: zmk-module-runtime-input-processor
       remote: cormoran
+      revision: main
+    - name: zmk-module-runtime-macro
+      remote: qtrnmr-gh
       revision: main
   self:
     path: config
