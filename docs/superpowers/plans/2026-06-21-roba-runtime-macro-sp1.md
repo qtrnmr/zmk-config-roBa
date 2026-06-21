@@ -143,7 +143,7 @@ git push   # feature ブランチ
 gh run watch "$(gh run list --branch "$(git branch --show-current)" --limit 1 --json databaseId --jq '.[0].databaseId')" --exit-status
 gh run view <id> --json jobs --jq '.jobs[] | {name:(.name[0:50]),conclusion}'
 ```
-Expected: roBa_R ジョブ success。失敗時はログの `custom` 関連シンボル未定義有無を確認（custom 封筒が core に無いなら設計見直し→報告）。
+Expected: roBa_R ジョブ success。（`v0.3-branch+dya` には `zmk/studio/custom.h` + `custom_subsystem.c` が存在することを別調査で確認済み＝custom 封筒は使える見込み。）失敗時はログの `custom`/RPC 関連シンボル未定義有無を確認し報告。
 
 ---
 
@@ -291,6 +291,8 @@ Expected: キーを押すと `hi` と入力される。
   int rt_macro_get_steps(uint8_t slot, struct rt_macro_step *out, uint8_t max, uint8_t *count_out);
   ```
 - Consumes: Zephyr settings (`SETTINGS_STATIC_HANDLER_DEFINE`, `settings_save_one`, `settings_load_subtree`).
+
+> 雛形参考: `app/src/rgb_underglow.c` の settings 部（`SETTINGS_STATIC_HANDLER_DEFINE` + `settings_name_steq` + `read_cb` + デバウンス work で `settings_save_one`）が keymap.c より単純で本タスク向き。ZMK 起動時に中央で `settings_load()` 済みなので、本ハンドラの h_set は自動で呼ばれる（独自に `settings_subsys_init/settings_load` を呼ぶ必要はない）。
 
 - [ ] **Step 1: `src/runtime_macro_store.c`（RAM キャッシュ + settings）**
 
@@ -555,7 +557,11 @@ python -m grpc_tools.protoc -I proto --python_out=roba_cli/proto proto/zmk/custo
 
 - [ ] **Step 1: `macro_client.py`（custom 封筒で send/recv）**
 
-pyserial で `/dev/cu.usbmodem*` を開き、`zmk_studio_Request{ custom: CallRequest{ subsystem_index/identifier="zmk__macros", payload=macros.Request bytes } }` を組み、framing して送信。応答 frame を decode→`Response.custom.CallResponse.payload`→`macros.Response` を parse。`request_id` を付与。（custom 封筒の正確な構造は Task1 で取得した cormoran custom.proto に従う。）
+pyserial で `/dev/cu.usbmodem*` を開く。**custom 封筒は2段呼び出し**（fork の custom_subsystem.c 仕様）:
+1. `zmk_studio_Request{ custom: ListCustomSubsystemsRequest }` を送り、応答から identifier `"zmk__macros"` の **数値 `subsystem_index`** を引いてキャッシュ。
+2. `zmk_studio_Request{ request_id, custom: CallRequest{ subsystem_index, payload = macros.Request を pb シリアライズした bytes } }` を組み、framing して送信。
+応答 frame を decode → `Response.request_response.custom.CallResponse.payload`(bytes) → `macros.Response` を pb parse。
+（`custom.proto` の正確なメッセージ名/フィールド番号は cormoran/zmk-studio-messages `custom-studio-protocol` 系ブランチの実ファイルに従う＝Task5 Step9 で取得した生成物を使用。）
 
 - [ ] **Step 2: cli.py に `macro get/set` 追加**
 
