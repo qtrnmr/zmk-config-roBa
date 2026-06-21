@@ -6,7 +6,13 @@
 
 **Architecture:** 既存 `zmk-studio-api`(Python, BLE) を薄くラップした CLI。純ロジック（behavior 文字列パーサ）は単体テスト、転送を伴う部分は実機(HIL)検証。出力は JSON で Claude Code がパース可能。
 
-**Tech Stack:** Python 3.11+, `zmk-studio-api==0.3.1`, pytest, venv。対象は macOS / roBa(BLE `F8:9A:A2:21:64:D4`)。
+**Tech Stack:** Python 3.11+, `zmk-studio-api`(source-built 0.4.0, serial+ble features — PyPI 0.3.1 は macOS で BLE 無効), pytest, venv。対象は macOS / roBa。
+
+> **転送ピボット（2026-06-21, 実機確定）**: BLE は GATT 接続できても Studio RPC が無応答だった。
+> dya Studio 拡張（ble-management/settings-rpc/battery-history）を roBa_R.conf で無効化し
+> `studio-rpc-usb-uart` スニペットを復活 → **USB serial 経由で上流 zmk-studio-api が標準 Studio に疎通**。
+> 以降 SP0 の転送は **USB serial**（`/dev/cu.usbmodem*` 自動検出、`--port` で明示可）。
+> `connection.open(port)` は `StudioClient.open_serial(port)` を使う。Task1 で `roba info` 疎通確認済み。
 
 ## Global Constraints
 
@@ -127,7 +133,7 @@ def _emit(obj: dict) -> None:
 
 
 def cmd_info(args: argparse.Namespace) -> int:
-    client = connection.open(args.device)
+    client = connection.open(args.port)
     _emit({
         "lock_state": client.get_lock_state(),
         "behavior_count": len(client.list_all_behaviors()),
@@ -327,7 +333,7 @@ def _append_backup(entry: dict) -> None:
 
 
 def cmd_key_get(args: argparse.Namespace) -> int:
-    client = connection.open(args.device)
+    client = connection.open(args.port)
     behavior = client.get_key_at(args.layer, args.position)
     _emit({"layer": args.layer, "position": args.position,
            "kind": behavior.kind, "repr": repr(behavior)})
@@ -336,7 +342,7 @@ def cmd_key_get(args: argparse.Namespace) -> int:
 
 def cmd_key_set(args: argparse.Namespace) -> int:
     import zmk_studio_api as zmk
-    client = connection.open(args.device)
+    client = connection.open(args.port)
     before = client.get_key_at(args.layer, args.position)
     _append_backup({"op": "set", "layer": args.layer, "position": args.position,
                     "before_kind": before.kind, "before_repr": repr(before),
@@ -406,14 +412,14 @@ git commit -m "feat(roba-cli): add key get/set with backup log and persistence"
 `cmd_key_set` の下に追記:
 ```python
 def cmd_reset(args: argparse.Namespace) -> int:
-    client = connection.open(args.device)
+    client = connection.open(args.port)
     ok = client.reset_settings()
     _emit({"reset_settings": ok, "note": "nvs reverted to devicetree defaults"})
     return 0
 
 
 def cmd_snapshot(args: argparse.Namespace) -> int:
-    client = connection.open(args.device)
+    client = connection.open(args.port)
     data = client.get_keymap_bytes()
     out = Path(args.path) if args.path else (
         BACKUP_LOG.parent / f"keymap-snapshot-{_dt.datetime.now():%Y%m%d-%H%M%S}.bin")
