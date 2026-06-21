@@ -58,6 +58,7 @@ def cmd_snapshot(args: argparse.Namespace) -> int:
     data = client.get_keymap_bytes()
     out = Path(args.path) if args.path else (
         BACKUP_LOG.parent / f"keymap-snapshot-{_dt.datetime.now():%Y%m%d-%H%M%S}.bin")
+    out.parent.mkdir(parents=True, exist_ok=True)
     out.write_bytes(data)
     _emit({"snapshot": str(out), "bytes": len(data),
            "note": "record only; full restore is via 'reset' (no set_keymap_bytes API)"})
