@@ -4,3 +4,5 @@ __pycache__/
 *.pyc
 dist/
 build/
+# runtime backup log of live key changes — not source
+.roba-backup.jsonl
