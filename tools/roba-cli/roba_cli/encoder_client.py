@@ -21,6 +21,7 @@ from .behavior_resolve import (
     BEHAVIOR_DISPLAY_CANDIDATES,
     BehaviorResolutionError,
     resolve_local_id,
+    _keycode_value,
 )
 
 SUBSYSTEM_ID = "cormoran_rsr"
@@ -33,17 +34,6 @@ SCRL = {
     "SCRL_LEFT": ((-10) & 0xFFFF) << 16,         # 4294311936
     "SCRL_RIGHT": (10 & 0xFFFF) << 16,           # 655360
 }
-
-
-def _keycode_value(name: str) -> int:
-    """Resolve a kp keycode name (or decimal) to its HID usage value."""
-    if name.isdigit():
-        return int(name)
-    import zmk_studio_api as zmk
-    val = getattr(zmk.Keycode, name.upper(), None)
-    if val is None:
-        raise ValueError(f"unknown keycode {name!r}")
-    return int(val)
 
 
 def parse_encoder_behavior(spec: str) -> tuple[str | None, int, int, int]:

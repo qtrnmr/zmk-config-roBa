@@ -16,7 +16,6 @@ from roba_cli.proto.zmk.combos import combos_pb2 as cb_pb2
 
 from . import rpc
 from .behavior_resolve import (
-    BehaviorResolutionError,
     parse_behavior_spec,
     resolve_local_id,
 )
