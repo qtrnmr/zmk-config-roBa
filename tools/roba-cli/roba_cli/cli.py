@@ -14,6 +14,7 @@ from .rip_client import RipClient
 from . import rip_client
 from .holdtap_client import HoldtapClient
 from . import holdtap_client
+from .condlayer_client import CondlayerClient
 
 
 def _emit(obj: dict) -> None:
@@ -244,6 +245,43 @@ def cmd_holdtap_reset(args: argparse.Namespace) -> int:
     return 0 if res["ok"] else 1
 
 
+def cmd_condlayer_list(args: argparse.Namespace) -> int:
+    with CondlayerClient(args.port) as client:
+        entries = client.list()
+    _emit({"condlayers": entries})
+    return 0
+
+
+def cmd_condlayer_get(args: argparse.Namespace) -> int:
+    with CondlayerClient(args.port) as client:
+        info = client.get(args.index)
+    _emit({"op": "condlayer_get", "index": args.index, **info})
+    return 0 if info.get("found") else 1
+
+
+def cmd_condlayer_set(args: argparse.Namespace) -> int:
+    with CondlayerClient(args.port) as client:
+        before = client.get(args.index)
+        _append_backup({"op": "condlayer_set", "index": args.index,
+                        "if_csv": args.if_csv, "then": args.then, "before": before})
+        res = client.set(args.index, args.if_csv, args.then)
+        after = client.get(args.index) if res["ok"] else {}
+    _emit({"op": "condlayer_set", "index": args.index, "if_layers": args.if_csv,
+           "then_layer": args.then, "ok": res["ok"], "error": res["error"], "after": after})
+    return 0 if res["ok"] else 1
+
+
+def cmd_condlayer_reset(args: argparse.Namespace) -> int:
+    with CondlayerClient(args.port) as client:
+        before = client.get(args.index)
+        _append_backup({"op": "condlayer_reset", "index": args.index, "before": before})
+        res = client.reset(args.index)
+        after = client.get(args.index) if res["ok"] else {}
+    _emit({"op": "condlayer_reset", "index": args.index, "ok": res["ok"],
+           "error": res["error"], "after": after})
+    return 0 if res["ok"] else 1
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="roba")
     parser.add_argument("--port", default=None,
@@ -317,6 +355,21 @@ def build_parser() -> argparse.ArgumentParser:
     htr = ht.add_parser("reset", help="Reset a slot to devicetree defaults")
     htr.add_argument("slot", type=int)
     htr.set_defaults(func=cmd_holdtap_reset)
+    cl = sub.add_parser("condlayer", help="Runtime conditional layers (zmk__condlayers)").add_subparsers(
+        dest="condlayer_cmd", required=True)
+    cl.add_parser("list", help="List all conditional-layer entries as JSON").set_defaults(
+        func=cmd_condlayer_list)
+    clg = cl.add_parser("get", help="Get one entry")
+    clg.add_argument("index", type=int)
+    clg.set_defaults(func=cmd_condlayer_get)
+    cls = cl.add_parser("set", help="Set an entry: if-layers CSV (e.g. 1,7) + then-layer")
+    cls.add_argument("index", type=int)
+    cls.add_argument("if_csv", help="comma-separated layer indices, e.g. '1,7'")
+    cls.add_argument("then", type=int)
+    cls.set_defaults(func=cmd_condlayer_set)
+    clr = cl.add_parser("reset", help="Reset an entry to devicetree defaults")
+    clr.add_argument("index", type=int)
+    clr.set_defaults(func=cmd_condlayer_reset)
     sub.add_parser("reset", help="Revert nvs to devicetree defaults").set_defaults(func=cmd_reset)
     snap = sub.add_parser("snapshot", help="Save raw keymap bytes for record")
     snap.add_argument("path", nargs="?", default=None)

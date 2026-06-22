@@ -36,5 +36,8 @@ manifest:
     - name: zmk-module-runtime-holdtap
       remote: qtrnmr-gh
       revision: main
+    - name: zmk-module-runtime-conditional-layers
+      remote: qtrnmr-gh
+      revision: main
   self:
     path: config
