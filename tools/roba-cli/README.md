@@ -1,4 +1,4 @@
-# roba-cli (SP0 / SP1 / W1a)
+# roba-cli (SP0 / SP1 / W1a / W1b)
 
 roBa を USB シリアル経由で焼かずに設定変更する CLI。
 
@@ -29,6 +29,19 @@ roBa を USB シリアル経由で焼かずに設定変更する CLI。
 - `roba layer restore <id> <at_index>` — 削除したレイヤーを復元
 
 mutating 操作はすべて変更前のレイヤー一覧を `.roba-backup.jsonl` に記録し、`save_changes` を伴う。
+
+### トラックボール/ポインタ設定（cormoran_rip・焼き直し不要）
+cormoran `zmk-module-runtime-input-processor`（subsystem `cormoran_rip`）で、トラックボールの感度・回転・反転・スクロール等を runtime 編集する。**初回のみ runtime-input-processor を含むファームの flash が必要**（以後の設定変更は焼き直し不要）。`west.yml` はモジュールを **tag `zmk-v0.3.0.0`** に pin（module `main` は zmk v4 へ移行済みで当 base `v0.3-branch+dya` ではビルド不可）。
+
+- `roba trackball get [--id N]` — プロセッサ状態を JSON 表示
+- `roba trackball set <field> <value> [--id N]` — フィールドを変更（変更前は `.roba-backup.jsonl` に記録）
+- `roba trackball reset [--id N]` — そのプロセッサを devicetree 既定へ戻す（**第一の revert 手段・live で効く**）
+
+set 可能な field: `scale-multiplier`, `scale-divisor`, `rotation`, `x-invert`, `y-invert`, `xy-swap`, `xy-to-scroll`, `axis-snap-mode`(none|x|y), `axis-snap-threshold`, `axis-snap-timeout`, `temp-layer-enabled`, `temp-layer-layer`, `temp-layer-activation-delay`, `temp-layer-deactivation-delay`, `active-layers`。
+
+実機検証済みの挙動:
+- **set は NVS 永続**（電源再投入後も保持）。**`roba trackball reset` は live で既定へ戻る**（layer rename と違い再起動不要）。最終手段は settings_reset.uf2。
+- この firmware revision では `get_input_processor` RPC が空構造体を返すため、`get` は **`list_input_processors` の notification 経路**で実値を取得している（host 側で吸収済み）。`scale-divisor`/`scale-multiplier` が感度、`rotation` が回転角。
 
 ## マクロ DSL
     type <text>       — ASCII 文字をキーとして送信
