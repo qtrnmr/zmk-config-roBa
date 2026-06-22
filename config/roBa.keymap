@@ -2,6 +2,7 @@
 #include <dt-bindings/zmk/bt.h>
 #include <dt-bindings/zmk/keys.h>
 #include <dt-bindings/zmk/pointing.h>
+#include <behaviors/runtime-sensor-rotate.dtsi>
 
 #undef ZMK_POINTING_DEFAULT_SCRL_VAL
 
@@ -199,10 +200,11 @@
         };
 
         encoder_vol_down_up: encoder_vol_down_up {
-            compatible = "zmk,behavior-sensor-rotate";
+            compatible = "zmk,behavior-runtime-sensor-rotate";
             label = "ENCODER_VOL_DOWN_UP";
             #sensor-binding-cells = <0>;
-            bindings = <&kp C_VOLUME_DOWN>, <&kp C_VOLUME_UP>;
+            cw-binding = <&kp C_VOLUME_DOWN>;
+            ccw-binding = <&kp C_VOLUME_UP>;
 
             tap-ms = <20>;
         };
