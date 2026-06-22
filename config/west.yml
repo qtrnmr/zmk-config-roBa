@@ -33,5 +33,8 @@ manifest:
     - name: zmk-module-runtime-macro
       remote: qtrnmr-gh
       revision: main
+    - name: zmk-module-runtime-holdtap
+      remote: qtrnmr-gh
+      revision: main
   self:
     path: config
