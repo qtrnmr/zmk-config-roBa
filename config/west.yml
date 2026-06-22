@@ -25,7 +25,11 @@ manifest:
       revision: main
     - name: zmk-module-runtime-input-processor
       remote: cormoran
-      revision: main
+      # Pin to the last pre-"Migrate to zmk v4" release: tag zmk-v0.3.0.0 keeps
+      # the full cormoran_rip RPC surface but uses the 1-arg
+      # zmk_keymap_layer_activate/deactivate that this v0.3-branch+dya base
+      # provides. Module `main` migrated to zmk v4 (2-arg) and won't build here.
+      revision: zmk-v0.3.0.0
     - name: zmk-module-runtime-macro
       remote: qtrnmr-gh
       revision: main

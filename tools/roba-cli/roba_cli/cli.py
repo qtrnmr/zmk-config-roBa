@@ -10,6 +10,8 @@ from . import behaviors
 from . import connection
 from . import macro_dsl
 from .keymap_client import KeymapClient
+from .rip_client import RipClient
+from . import rip_client
 
 
 def _emit(obj: dict) -> None:
@@ -170,6 +172,39 @@ def cmd_layer_restore(args: argparse.Namespace) -> int:
     return 0 if res["ok"] else 1
 
 
+def cmd_trackball_get(args: argparse.Namespace) -> int:
+    with RipClient(args.port) as client:
+        res = client.get(args.id)
+    _emit({"op": "trackball_get", "id": args.id, **res})
+    return 0 if res["ok"] else 1
+
+
+def cmd_trackball_set(args: argparse.Namespace) -> int:
+    with RipClient(args.port) as client:
+        before = client.get(args.id)
+        _append_backup({"op": "trackball_set", "id": args.id,
+                        "field": args.field, "value": args.value,
+                        "before": before.get("processor")})
+        res = client.set(args.field, args.id, args.value)
+        after = client.get(args.id) if res["ok"] else {"processor": None}
+    _emit({"op": "trackball_set", "id": args.id, "field": args.field,
+           "value": args.value, "ok": res["ok"], "error": res["error"],
+           "after": after.get("processor")})
+    return 0 if res["ok"] else 1
+
+
+def cmd_trackball_reset(args: argparse.Namespace) -> int:
+    with RipClient(args.port) as client:
+        before = client.get(args.id)
+        _append_backup({"op": "trackball_reset", "id": args.id,
+                        "before": before.get("processor")})
+        res = client.reset(args.id)
+        after = client.get(args.id) if res["ok"] else {"processor": None}
+    _emit({"op": "trackball_reset", "id": args.id, "ok": res["ok"],
+           "error": res["error"], "after": after.get("processor")})
+    return 0 if res["ok"] else 1
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="roba")
     parser.add_argument("--port", default=None,
@@ -215,6 +250,19 @@ def build_parser() -> argparse.ArgumentParser:
     lrs.add_argument("layer_id", type=int)
     lrs.add_argument("at_index", type=int)
     lrs.set_defaults(func=cmd_layer_restore)
+    tb = sub.add_parser("trackball", help="Runtime trackball/pointer config (cormoran_rip)").add_subparsers(
+        dest="trackball_cmd", required=True)
+    tbg = tb.add_parser("get", help="Get processor state as JSON")
+    tbg.add_argument("--id", type=int, default=0)
+    tbg.set_defaults(func=cmd_trackball_get)
+    tbs = tb.add_parser("set", help=f"Set a field. fields: {sorted(rip_client.FIELD_SPECS)}")
+    tbs.add_argument("field")
+    tbs.add_argument("value")
+    tbs.add_argument("--id", type=int, default=0)
+    tbs.set_defaults(func=cmd_trackball_set)
+    tbr = tb.add_parser("reset", help="Reset processor to devicetree defaults")
+    tbr.add_argument("--id", type=int, default=0)
+    tbr.set_defaults(func=cmd_trackball_reset)
     sub.add_parser("reset", help="Revert nvs to devicetree defaults").set_defaults(func=cmd_reset)
     snap = sub.add_parser("snapshot", help="Save raw keymap bytes for record")
     snap.add_argument("path", nargs="?", default=None)
