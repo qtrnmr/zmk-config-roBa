@@ -139,11 +139,28 @@ def test_sensors_decodes_over_custom_envelope():
     assert [s["name"] for s in d["sensors"]] == ["encoder_left", "encoder_right"]
 
 
-def test_resolve_behavior_local_id_crc16_when_present():
-    # behavior list contains the crc16 id -> resolves
+def test_resolve_behavior_local_id_by_display_name():
+    # settings-table mode (real roBa): crc16 ids absent; resolve by display_name.
+    # kp -> friendly "Key Press"; msc -> node-name fallback "mouse_scroll".
     c = ec.EncoderClient(_ser=_FakeSerial(b""))
     c._index = 0
-    c._behavior_ids = lambda: {13527, 7776, 99}   # stub the live id set
+    c.behaviors = lambda: {"ok": True, "error": "", "behaviors": [
+        {"id": 14, "display_name": "Key Press"},
+        {"id": 5, "display_name": "mouse_scroll"},
+        {"id": 20, "display_name": "Momentary Layer"},
+    ]}
+    assert c.resolve_behavior_local_id("kp") == 14
+    assert c.resolve_behavior_local_id("msc") == 5
+
+
+def test_resolve_behavior_local_id_crc16_fallback():
+    # crc16 mode: no display_name match, but the crc16 id is in the live set.
+    c = ec.EncoderClient(_ser=_FakeSerial(b""))
+    c._index = 0
+    c.behaviors = lambda: {"ok": True, "error": "", "behaviors": [
+        {"id": 13527, "display_name": ""},
+        {"id": 7776, "display_name": ""},
+    ]}
     assert c.resolve_behavior_local_id("kp") == 13527
     assert c.resolve_behavior_local_id("msc") == 7776
 
@@ -152,7 +169,9 @@ def test_resolve_behavior_local_id_raises_when_absent():
     import pytest
     c = ec.EncoderClient(_ser=_FakeSerial(b""))
     c._index = 0
-    c._behavior_ids = lambda: {1, 2, 3}
+    c.behaviors = lambda: {"ok": True, "error": "", "behaviors": [
+        {"id": 1, "display_name": "Bluetooth"},
+    ]}
     with pytest.raises(ec.BehaviorResolutionError):
         c.resolve_behavior_local_id("kp")
 
