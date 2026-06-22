@@ -15,6 +15,7 @@ from . import rip_client
 from .holdtap_client import HoldtapClient
 from . import holdtap_client
 from .condlayer_client import CondlayerClient
+from .encoder_client import EncoderClient
 
 
 def _emit(obj: dict) -> None:
@@ -282,6 +283,39 @@ def cmd_condlayer_reset(args: argparse.Namespace) -> int:
     return 0 if res["ok"] else 1
 
 
+def cmd_encoder_sensors(args: argparse.Namespace) -> int:
+    with EncoderClient(args.port) as c:
+        _emit(c.sensors())
+    return 0
+
+
+def cmd_encoder_get(args: argparse.Namespace) -> int:
+    with EncoderClient(args.port) as c:
+        _emit(c.get(args.sensor))
+    return 0
+
+
+def cmd_encoder_set(args: argparse.Namespace) -> int:
+    with EncoderClient(args.port) as c:
+        res = c.set(args.sensor, args.layer, args.direction, args.behavior,
+                    tap_ms=args.tap_ms)
+    _emit(res)
+    return 0 if res["ok"] else 1
+
+
+def cmd_encoder_reset(args: argparse.Namespace) -> int:
+    with EncoderClient(args.port) as c:
+        res = c.reset(args.sensor, args.layer)
+    _emit(res)
+    return 0 if res["ok"] else 1
+
+
+def cmd_encoder_behaviors(args: argparse.Namespace) -> int:
+    with EncoderClient(args.port) as c:
+        _emit(c.behaviors())
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="roba")
     parser.add_argument("--port", default=None,
@@ -370,6 +404,25 @@ def build_parser() -> argparse.ArgumentParser:
     clr = cl.add_parser("reset", help="Reset an entry to devicetree defaults")
     clr.add_argument("index", type=int)
     clr.set_defaults(func=cmd_condlayer_reset)
+    enc = sub.add_parser("encoder", help="runtime sensor-rotate (encoder) bindings").add_subparsers(
+        dest="encoder_cmd", required=True)
+    enc.add_parser("sensors", help="list sensors").set_defaults(func=cmd_encoder_sensors)
+    e_get = enc.add_parser("get", help="show all per-layer bindings for a sensor")
+    e_get.add_argument("--sensor", type=int, default=0)
+    e_get.set_defaults(func=cmd_encoder_get)
+    e_set = enc.add_parser("set", help="set a layer's cw/ccw binding")
+    e_set.add_argument("sensor", type=int)
+    e_set.add_argument("layer", type=int)
+    e_set.add_argument("direction", choices=["cw", "ccw"])
+    e_set.add_argument("behavior", help="e.g. 'kp C_VOL_UP', 'msc SCRL_DOWN', 'raw 7776 65526 0'")
+    e_set.add_argument("--tap-ms", dest="tap_ms", type=int, default=None)
+    e_set.set_defaults(func=cmd_encoder_set)
+    e_reset = enc.add_parser("reset", help="revert a layer to the DT default (set id 0)")
+    e_reset.add_argument("sensor", type=int)
+    e_reset.add_argument("layer", type=int)
+    e_reset.set_defaults(func=cmd_encoder_reset)
+    enc.add_parser("behaviors", help="list live behaviors (id, display_name)").set_defaults(
+        func=cmd_encoder_behaviors)
     sub.add_parser("reset", help="Revert nvs to devicetree defaults").set_defaults(func=cmd_reset)
     snap = sub.add_parser("snapshot", help="Save raw keymap bytes for record")
     snap.add_argument("path", nargs="?", default=None)
