@@ -1,4 +1,4 @@
-# roba-cli (SP0 / SP1 / W1a / W1b)
+# roba-cli (SP0 / SP1 / W1a / W1b / W2a)
 
 roBa を USB シリアル経由で焼かずに設定変更する CLI。
 
@@ -42,6 +42,17 @@ set 可能な field: `scale-multiplier`, `scale-divisor`, `rotation`, `x-invert`
 実機検証済みの挙動:
 - **set は NVS 永続**（電源再投入後も保持）。**`roba trackball reset` は live で既定へ戻る**（layer rename と違い再起動不要）。最終手段は settings_reset.uf2。
 - この firmware revision では `get_input_processor` RPC が空構造体を返すため、`get` は **`list_input_processors` の notification 経路**で実値を取得している（host 側で吸収済み）。`scale-divisor`/`scale-multiplier` が感度、`rotation` が回転角。
+
+### hold-tap タイミング（zmk__holdtap・焼き直し不要）
+自作モジュール `qtrnmr/zmk-module-runtime-holdtap`（core hold-tap の逐語フォーク、判定ロジック不変）で、hold-tap の `tapping-term-ms`/`quick-tap-ms`/`require-prior-idle-ms`/`flavor` を runtime 編集する。**初回のみ flash 要**。roBa の `lt_to_*`（LANG1/LANG2 サムキー）が slot 0..3。
+
+- `roba holdtap list` — 全スロットの timing を JSON 列挙
+- `roba holdtap get <slot>` — 1スロットの timing
+- `roba holdtap set <slot> <field> <value>` — 変更（変更前は `.roba-backup.jsonl` に記録）
+  - fields: `tapping-term-ms`, `quick-tap-ms`, `require-prior-idle-ms`, `flavor`(hold-preferred|balanced|tap-preferred|tap-unless-interrupted)
+- `roba holdtap reset <slot>` — そのスロットを devicetree 既定へ（live で復帰）
+
+set は NVS 永続。`roba holdtap reset` または `roba reset` で既定へ。例: `roba holdtap set 0 tapping-term-ms 120` で 0 番の hold 判定が速くなる。
 
 ## マクロ DSL
     type <text>       — ASCII 文字をキーとして送信

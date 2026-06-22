@@ -12,6 +12,8 @@ from . import macro_dsl
 from .keymap_client import KeymapClient
 from .rip_client import RipClient
 from . import rip_client
+from .holdtap_client import HoldtapClient
+from . import holdtap_client
 
 
 def _emit(obj: dict) -> None:
@@ -205,6 +207,43 @@ def cmd_trackball_reset(args: argparse.Namespace) -> int:
     return 0 if res["ok"] else 1
 
 
+def cmd_holdtap_list(args: argparse.Namespace) -> int:
+    with HoldtapClient(args.port) as client:
+        slots = client.list()
+    _emit({"holdtaps": slots})
+    return 0
+
+
+def cmd_holdtap_get(args: argparse.Namespace) -> int:
+    with HoldtapClient(args.port) as client:
+        info = client.get(args.slot)
+    _emit({"op": "holdtap_get", "slot": args.slot, **info})
+    return 0 if info.get("found") else 1
+
+
+def cmd_holdtap_set(args: argparse.Namespace) -> int:
+    with HoldtapClient(args.port) as client:
+        before = client.get(args.slot)
+        _append_backup({"op": "holdtap_set", "slot": args.slot,
+                        "field": args.field, "value": args.value, "before": before})
+        res = client.set(args.slot, args.field, args.value)
+        after = client.get(args.slot) if res["ok"] else {}
+    _emit({"op": "holdtap_set", "slot": args.slot, "field": args.field,
+           "value": args.value, "ok": res["ok"], "error": res["error"], "after": after})
+    return 0 if res["ok"] else 1
+
+
+def cmd_holdtap_reset(args: argparse.Namespace) -> int:
+    with HoldtapClient(args.port) as client:
+        before = client.get(args.slot)
+        _append_backup({"op": "holdtap_reset", "slot": args.slot, "before": before})
+        res = client.reset(args.slot)
+        after = client.get(args.slot) if res["ok"] else {}
+    _emit({"op": "holdtap_reset", "slot": args.slot, "ok": res["ok"],
+           "error": res["error"], "after": after})
+    return 0 if res["ok"] else 1
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="roba")
     parser.add_argument("--port", default=None,
@@ -263,6 +302,21 @@ def build_parser() -> argparse.ArgumentParser:
     tbr = tb.add_parser("reset", help="Reset processor to devicetree defaults")
     tbr.add_argument("--id", type=int, default=0)
     tbr.set_defaults(func=cmd_trackball_reset)
+    ht = sub.add_parser("holdtap", help="Runtime hold-tap timing (zmk__holdtap)").add_subparsers(
+        dest="holdtap_cmd", required=True)
+    ht.add_parser("list", help="List all runtime hold-tap slots as JSON").set_defaults(
+        func=cmd_holdtap_list)
+    htg = ht.add_parser("get", help="Get one slot's timing")
+    htg.add_argument("slot", type=int)
+    htg.set_defaults(func=cmd_holdtap_get)
+    hts = ht.add_parser("set", help=f"Set a field. fields: {sorted(holdtap_client.SET_FIELDS)}")
+    hts.add_argument("slot", type=int)
+    hts.add_argument("field")
+    hts.add_argument("value")
+    hts.set_defaults(func=cmd_holdtap_set)
+    htr = ht.add_parser("reset", help="Reset a slot to devicetree defaults")
+    htr.add_argument("slot", type=int)
+    htr.set_defaults(func=cmd_holdtap_reset)
     sub.add_parser("reset", help="Revert nvs to devicetree defaults").set_defaults(func=cmd_reset)
     snap = sub.add_parser("snapshot", help="Save raw keymap bytes for record")
     snap.add_argument("path", nargs="?", default=None)

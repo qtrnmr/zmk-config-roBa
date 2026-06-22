@@ -163,7 +163,7 @@
         };
 
         lt_to_apple_default: lt_to_apple_default {
-            compatible = "zmk,behavior-hold-tap";
+            compatible = "zmk,behavior-runtime-hold-tap";
             label = "LAYER_TAP_TO_APPLE";
             bindings = <&mo>, <&to_apple_default>;
 
@@ -172,7 +172,7 @@
         };
 
         lt_to_ipad: lt_to_ipad {
-            compatible = "zmk,behavior-hold-tap";
+            compatible = "zmk,behavior-runtime-hold-tap";
             label = "LAYER_TAP_TO_IPAD";
             bindings = <&mo>, <&to_ipad>;
 
@@ -181,7 +181,7 @@
         };
 
         lt_to_iphone: lt_to_iphone {
-            compatible = "zmk,behavior-hold-tap";
+            compatible = "zmk,behavior-runtime-hold-tap";
             label = "LAYER_TAP_TO_IPHONE";
             bindings = <&mo>, <&to_iphone>;
 
