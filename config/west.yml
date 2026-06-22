@@ -45,5 +45,8 @@ manifest:
       # pre-"Migrate to zmk v4" release and keeps the full custom-RPC surface
       # against this v0.3-branch+dya base. Module `main` won't build here.
       revision: zmk-v0.3.0.0
+    - name: zmk-module-runtime-combos
+      remote: qtrnmr-gh
+      revision: main
   self:
     path: config
