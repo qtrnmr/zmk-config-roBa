@@ -1,6 +1,7 @@
 import roba_cli.proto  # noqa: F401  sets sys.path
 from roba_cli.proto.cormoran.rip import custom_pb2 as rip_pb2
 from roba_cli import rip_client as rc
+from roba_cli import cli as _cli
 
 
 def test_rip_proto_imports_and_oneof_fields_exist():
@@ -41,6 +42,16 @@ def test_build_set_request_unknown_field_raises():
     import pytest
     with pytest.raises(ValueError):
         rc.build_set_request("nope", 0, "1")
+
+
+def test_trackball_subcommands_parse():
+    p = _cli.build_parser()
+    ns = p.parse_args(["trackball", "set", "scale-divisor", "4"])
+    assert ns.field == "scale-divisor" and ns.value == "4" and ns.id == 0
+    ns2 = p.parse_args(["trackball", "get", "--id", "1"])
+    assert ns2.id == 1 and ns2.func is _cli.cmd_trackball_get
+    ns3 = p.parse_args(["trackball", "reset"])
+    assert ns3.func is _cli.cmd_trackball_reset
 
 
 def test_info_to_dict_and_decode_response():
