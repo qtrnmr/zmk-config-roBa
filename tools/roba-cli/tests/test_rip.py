@@ -1,7 +1,61 @@
 import roba_cli.proto  # noqa: F401  sets sys.path
+import studio_pb2
 from roba_cli.proto.cormoran.rip import custom_pb2 as rip_pb2
 from roba_cli import rip_client as rc
 from roba_cli import cli as _cli
+from roba_cli.framing import encode_frame
+
+
+class _FakeSerial:
+    """Serial stub yielding a fixed byte payload, then empty reads."""
+    def __init__(self, payload: bytes):
+        self._payload = bytearray(payload)
+        self.written = bytearray()
+
+    def write(self, b):
+        self.written += b
+
+    def flush(self):
+        pass
+
+    def read(self, n):
+        if not self._payload:
+            return b""
+        out = bytes(self._payload[:n])
+        del self._payload[:n]
+        return out
+
+
+def _list_notif_frame(**fields) -> bytes:
+    """A studio.Response notification carrying one InputProcessorChangedNotification."""
+    notif = studio_pb2.Response()
+    rn = rip_pb2.Notification()
+    p = rn.input_processor_changed.processor
+    for k, v in fields.items():
+        setattr(p, k, v)
+    cn = notif.notification.custom.custom_notification
+    cn.subsystem_index = 0
+    cn.payload = rn.SerializeToString()
+    return encode_frame(notif.SerializeToString())
+
+
+def test_get_uses_list_notification_path():
+    ser = _FakeSerial(_list_notif_frame(id=0, name="mouse", scale_multiplier=1, scale_divisor=2))
+    c = rc.RipClient(_ser=ser)
+    c._index = 0  # skip subsystem resolve (no IO for it)
+    res = c.get(0)
+    assert res["ok"] is True
+    assert res["processor"]["name"] == "mouse"
+    assert res["processor"]["scale_divisor"] == 2
+
+
+def test_get_missing_id_returns_not_found():
+    ser = _FakeSerial(_list_notif_frame(id=0, name="mouse"))
+    c = rc.RipClient(_ser=ser)
+    c._index = 0
+    res = c.get(7)
+    assert res["ok"] is False
+    assert "not found" in res["error"]
 
 
 def test_rip_proto_imports_and_oneof_fields_exist():

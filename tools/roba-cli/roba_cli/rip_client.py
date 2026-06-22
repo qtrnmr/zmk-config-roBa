@@ -6,6 +6,8 @@ response decoders are unit-tested; the thin client is HIL-tested.
 """
 from __future__ import annotations
 
+import time
+
 import serial
 
 import roba_cli.proto  # noqa: F401  sets sys.path
@@ -14,6 +16,7 @@ import custom_pb2
 from roba_cli.proto.cormoran.rip import custom_pb2 as rip_pb2
 
 from . import rpc
+from .framing import encode_frame, decode_frame
 
 SUBSYSTEM_ID = "cormoran_rip"
 
@@ -95,9 +98,14 @@ def decode_response(resp: "rip_pb2.Response") -> dict:
 
 
 class RipClient:
-    def __init__(self, port: str | None = None, baud: int = rpc.DEFAULT_BAUD):
-        target = port or rpc.find_port()
-        self._ser = serial.Serial(target, baud, timeout=0.1)
+    def __init__(self, port: str | None = None, baud: int = rpc.DEFAULT_BAUD,
+                 _ser=None):
+        # _ser is a test seam: inject a serial-like stub to avoid opening a port.
+        if _ser is not None:
+            self._ser = _ser
+        else:
+            target = port or rpc.find_port()
+            self._ser = serial.Serial(target, baud, timeout=0.1)
         self._index: int | None = None
         self._rid = 0
 
@@ -142,8 +150,60 @@ class RipClient:
         rip_resp.ParseFromString(sresp.request_response.custom.call.payload)
         return rip_resp
 
+    def _list_processors(self, timeout: float = rpc.READ_TIMEOUT) -> list:
+        """Send list_input_processors and collect the InputProcessorInfo from
+        the InputProcessorChangedNotification frames.
+
+        NOTE: in this firmware revision the get_input_processor RPC returns an
+        empty struct, but list_input_processors emits one notification per
+        processor with the real live values (and sends NO request_response
+        ack). So we read notification frames and return once the serial drains
+        after at least one processor was seen (or until timeout).
+        """
+        idx = self._resolve_index()
+        sreq = studio_pb2.Request()
+        sreq.request_id = self._next_rid()
+        sreq.custom.call.subsystem_index = idx
+        rip_req = rip_pb2.Request()
+        rip_req.list_input_processors.SetInParent()
+        sreq.custom.call.payload = rip_req.SerializeToString()
+        self._ser.write(encode_frame(sreq.SerializeToString()))
+        self._ser.flush()
+
+        procs: list = []
+        buf = bytearray()
+        deadline = time.monotonic() + timeout
+        while time.monotonic() < deadline:
+            frame, buf = rpc._extract_frame(buf)
+            if frame is not None:
+                resp = studio_pb2.Response()
+                resp.ParseFromString(decode_frame(frame))
+                if (resp.WhichOneof("type") == "notification"
+                        and resp.notification.WhichOneof("subsystem") == "custom"):
+                    rn = rip_pb2.Notification()
+                    rn.ParseFromString(resp.notification.custom.custom_notification.payload)
+                    if rn.WhichOneof("notification_type") == "input_processor_changed":
+                        procs.append(rn.input_processor_changed.processor)
+                continue
+            chunk = self._ser.read(rpc.CHUNK)
+            if chunk:
+                buf += chunk
+            elif procs:
+                break  # serial drained and we have at least one processor
+        return procs
+
+    def list(self) -> dict:
+        """Return all processors (via the list notification path)."""
+        return {"ok": True, "error": "",
+                "processors": [info_to_dict(p) for p in self._list_processors()]}
+
     def get(self, id: int = 0) -> dict:
-        return decode_response(self._call(build_get_request(id)))
+        # get_input_processor RPC is broken in this fw revision; use the list
+        # notification path and filter by id.
+        for p in self._list_processors():
+            if p.id == id:
+                return {"ok": True, "error": "", "processor": info_to_dict(p)}
+        return {"ok": False, "error": f"processor id {id} not found", "processor": None}
 
     def set(self, field: str, id: int, raw_value: str) -> dict:
         return decode_response(self._call(build_set_request(field, id, raw_value)))
