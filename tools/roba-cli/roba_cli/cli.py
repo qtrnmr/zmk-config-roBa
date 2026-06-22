@@ -135,9 +135,7 @@ def cmd_layer_add(args: argparse.Namespace) -> int:
         _backup_layers(client)
         res = client.add()
         if res["ok"]:
-            save = client.save()
-            res["ok"] = save["ok"]
-            res.setdefault("error", save["error"])
+            res.update(client.save())
     _emit({"op": "add", **res})
     return 0 if res["ok"] else 1
 
@@ -147,7 +145,7 @@ def cmd_layer_remove(args: argparse.Namespace) -> int:
         _backup_layers(client)
         res = client.remove(args.index)
         if res["ok"]:
-            res = client.save()
+            res.update(client.save())
     _emit({"op": "remove", "index": args.index, **res})
     return 0 if res["ok"] else 1
 
@@ -157,7 +155,7 @@ def cmd_layer_move(args: argparse.Namespace) -> int:
         _backup_layers(client)
         res = client.move(args.start, args.dest)
         if res["ok"]:
-            res = client.save()
+            res.update(client.save())
     _emit({"op": "move", "start": args.start, "dest": args.dest, **res})
     return 0 if res["ok"] else 1
 
@@ -167,7 +165,7 @@ def cmd_layer_restore(args: argparse.Namespace) -> int:
         _backup_layers(client)
         res = client.restore(args.layer_id, args.at_index)
         if res["ok"]:
-            res = client.save()
+            res.update(client.save())
     _emit({"op": "restore", "layer_id": args.layer_id, "at_index": args.at_index, **res})
     return 0 if res["ok"] else 1
 

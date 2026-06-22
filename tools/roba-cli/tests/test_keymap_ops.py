@@ -100,3 +100,33 @@ def test_layer_subcommands_parse():
     assert ns2.start == 2 and ns2.dest == 5
     ns3 = p.parse_args(["layer", "list"])
     assert ns3.func is _cli.cmd_layer_list
+
+
+import json as _json
+
+
+class _FakeClient:
+    def __init__(self, add_res, save_res):
+        self._add = add_res
+        self._save = save_res
+    def __enter__(self): return self
+    def __exit__(self, *a): return False
+    def add(self): return dict(self._add)
+    def save(self): return dict(self._save)
+
+
+def test_cmd_layer_add_surfaces_save_error(monkeypatch, capsys):
+    fake = _FakeClient(
+        add_res={"ok": True, "error": "", "index": 5},
+        save_res={"ok": False, "error": "SAVE_CHANGES_ERR_NO_SPACE"},
+    )
+    monkeypatch.setattr(_cli, "KeymapClient", lambda *a, **k: fake)
+    # also no-op the backup so no file/serial is touched
+    monkeypatch.setattr(_cli, "_backup_layers", lambda client: None)
+    ns = _cli.build_parser().parse_args(["layer", "add"])
+    rc = ns.func(ns)
+    out = _json.loads(capsys.readouterr().out.strip())
+    assert rc == 1
+    assert out["ok"] is False
+    assert out["error"] == "SAVE_CHANGES_ERR_NO_SPACE"
+    assert out["index"] == 5  # op key preserved through the merge
