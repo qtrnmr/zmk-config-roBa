@@ -1,4 +1,4 @@
-# roba-cli (SP0 / SP1 / W1a / W1b / W2a / W2b)
+# roba-cli (SP0 / SP1 / W1a / W1b / W2a / W2b / W2c)
 
 roBa を USB シリアル経由で焼かずに設定変更する CLI。
 
@@ -53,6 +53,18 @@ set 可能な field: `scale-multiplier`, `scale-divisor`, `rotation`, `x-invert`
 - `roba holdtap reset <slot>` — そのスロットを devicetree 既定へ（live で復帰）
 
 set は NVS 永続。`roba holdtap reset` または `roba reset` で既定へ。例: `roba holdtap set 0 tapping-term-ms 120` で 0 番の hold 判定が速くなる。
+
+### エンコーダ回転バインディング（cormoran_rsr・焼き直し不要）
+cormoran `zmk-behavior-runtime-sensor-rotate`（subsystem `cormoran_rsr`）で、ロータリーエンコーダの CW/CCW バインディングをレイヤーごとに runtime 編集する。**初回のみ runtime-sensor-rotate を含むファームの flash が必要**（以後の変更は焼き直し不要）。`west.yml` はモジュールを **tag `zmk-v0.3.0.0`** に pin（W1b と同様の方針）。roBa は `encoder_vol_down_up` を runtime variant に変換済み（cw=C_VOLUME_DOWN, ccw=C_VOLUME_UP）。
+
+- `roba encoder sensors` — センサー一覧 `{index, name}` を JSON 表示（active は index 0 の左エンコーダ）
+- `roba encoder get [--sensor N]` — 全レイヤーの `cw`/`ccw` バインディングを JSON 表示
+- `roba encoder set <sensor> <layer> <cw|ccw> "<behavior>"` — バインディングを変更（revert は `encoder reset` で行う）
+  - behaviors: `kp <KEYCODE>`（例 `kp C_VOL_UP`）、`msc <SCRL_x>`（例 `msc SCRL_DOWN`）、`raw <behavior_id> <param1> [param2]`。`--tap-ms N` オプション対応
+- `roba encoder reset <sensor> <layer>` — デバイスツリー既定へ戻す（behavior id 0 をセット → live fallback で vol up/down）
+- `roba encoder behaviors` — ライブの behavior 一覧 `{id, display_name}` を JSON 表示（discovery 用）
+
+behavior トークンは `crc16_ansi(device_name)` で local_id を算出しライブ behavior-id リストと照合して解決する。firmware が settings-table local-id モードの場合は `behaviors` + `raw` を使用する。**`roba reset` はエンコーダバインディングをクリアしない**（revert はレイヤーごとに `encoder reset` を使う）。set は NVS 永続。
 
 ### conditional layers（zmk__condlayers・焼き直し不要）
 自前モジュール `qtrnmr/zmk-module-runtime-conditional-layers`（core `conditional_layer.c` の逐語フォーク、判定ロジック不変）で、各 conditional layer の `if-layers`/`then-layer` を runtime 編集する。**初回のみ flash 要**。roBa keymap の `conditional_layers` ノードは compatible `zmk,runtime-conditional-layers` に切替済み。entry index 0..N-1（roBa は 5）。
