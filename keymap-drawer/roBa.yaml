@@ -82,9 +82,9 @@ layers:
   - LEFT GUI
   - LCTRL
   - LEFT ALT
-  - {t: '&to_apple_default LANG2', h: SETTING}
+  - '&lt_to_apple_default 9 LANG2'
   - {t: SPACE, h: NUM}
-  - {t: '&to_apple_default LANG1', h: ARROW}
+  - '&lt_to_apple_default 6 LANG1'
   - BACKSPACE
   - {t: ENTER, h: FUNCTION}
   - DEL
@@ -126,9 +126,9 @@ layers:
   - LEFT GUI
   - LCTRL
   - LEFT ALT
-  - {t: '&to_ipad LANG2', h: SETTING}
+  - '&lt_to_ipad 9 LANG2'
   - {t: SPACE, h: NUM}
-  - {t: '&to_ipad LANG1', h: ARROW}
+  - '&lt_to_ipad 6 LANG1'
   - BACKSPACE
   - {t: ENTER, h: FUNCTION}
   - DEL
@@ -170,9 +170,9 @@ layers:
   - LEFT GUI
   - LCTRL
   - LEFT ALT
-  - {t: '&to_iphone LANG2', h: SETTING}
+  - '&lt_to_iphone 9 LANG2'
   - {t: SPACE, h: NUM}
-  - {t: '&to_iphone LANG1', h: ARROW}
+  - '&lt_to_iphone 6 LANG1'
   - BACKSPACE
   - {t: ENTER, h: FUNCTION}
   - DEL
@@ -304,7 +304,7 @@ layers:
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
-  - {type: held}
+  - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
@@ -524,7 +524,7 @@ layers:
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
-  - {type: held}
+  - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
@@ -568,7 +568,7 @@ layers:
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
-  - {type: held}
+  - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
