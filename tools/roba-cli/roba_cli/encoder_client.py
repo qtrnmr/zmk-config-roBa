@@ -15,22 +15,15 @@ import custom_pb2
 from roba_cli.proto.cormoran.rsr import custom_pb2 as rsr_pb2
 
 from . import rpc
+from .behavior_resolve import (
+    crc16_ansi,
+    BEHAVIOR_DEV_NAME,
+    BEHAVIOR_DISPLAY_CANDIDATES,
+    BehaviorResolutionError,
+    resolve_local_id,
+)
 
 SUBSYSTEM_ID = "cormoran_rsr"
-
-# Device names whose crc16_ansi == the firmware behavior_local_id (CRC16 mode).
-BEHAVIOR_DEV_NAME = {"kp": "key_press", "msc": "mouse_scroll"}
-
-# Studio behavior display_name candidates per token (lowercased). The firmware
-# reports the friendly display-name when one is set (kp -> "Key Press") and falls
-# back to the device/node name otherwise (msc -> "mouse_scroll"). Matching on
-# display_name resolves the local_id in BOTH crc16 and settings-table modes,
-# whereas crc16(device_name) only matches in crc16 mode. So display_name is the
-# primary resolver and crc16 is the fallback.
-BEHAVIOR_DISPLAY_CANDIDATES = {
-    "kp": {"key press", "key_press"},
-    "msc": {"mouse scroll", "mouse_scroll"},
-}
 
 # msc scroll params, from dt-bindings/zmk/pointing.h (MOVE_VAL=600, SCRL_VAL=10):
 #   SCRL_UP=MOVE_Y(10), SCRL_DOWN=MOVE_Y(-10), SCRL_LEFT=MOVE_X(-10), SCRL_RIGHT=MOVE_X(10)
@@ -40,16 +33,6 @@ SCRL = {
     "SCRL_LEFT": ((-10) & 0xFFFF) << 16,         # 4294311936
     "SCRL_RIGHT": (10 & 0xFFFF) << 16,           # 655360
 }
-
-
-def crc16_ansi(data: bytes) -> int:
-    """CRC-16/ARC (reflected poly 0xA001, init 0x0000) — matches Zephyr crc16_ansi."""
-    crc = 0
-    for byte in data:
-        crc ^= byte
-        for _ in range(8):
-            crc = (crc >> 1) ^ 0xA001 if (crc & 1) else (crc >> 1)
-    return crc & 0xFFFF
 
 
 def _keycode_value(name: str) -> int:
@@ -158,10 +141,6 @@ def decode_response(resp: "rsr_pb2.Response") -> dict:
 DEFAULT_TAP_MS = 20
 
 
-class BehaviorResolutionError(RuntimeError):
-    pass
-
-
 class EncoderClient:
     def __init__(self, port: str | None = None, baud: int = rpc.DEFAULT_BAUD, _ser=None):
         if _ser is not None:
@@ -224,23 +203,7 @@ class EncoderClient:
     def resolve_behavior_local_id(self, token: str) -> int:
         if token not in BEHAVIOR_DEV_NAME:
             raise BehaviorResolutionError(f"no device name known for token {token!r}")
-        behs = self.behaviors()["behaviors"]
-        # Primary: match by display_name (works in crc16 AND settings-table modes).
-        wanted = BEHAVIOR_DISPLAY_CANDIDATES.get(token, set())
-        for b in behs:
-            if b["display_name"].lower() in wanted:
-                return b["id"]
-        # Fallback: crc16(device_name) cross-checked against the live id set.
-        candidate = crc16_ansi(BEHAVIOR_DEV_NAME[token].encode())
-        live = {b["id"] for b in behs}
-        if candidate in live:
-            return candidate
-        raise BehaviorResolutionError(
-            f"could not resolve '{token}' ({BEHAVIOR_DEV_NAME[token]}): no behavior "
-            f"with display_name in {sorted(wanted)} and crc16 id {candidate} not in "
-            f"live ids. Use 'roba encoder behaviors' to list ids and pass "
-            f"'raw <id> <param1> [param2]'."
-        )
+        return resolve_local_id(self.behaviors()["behaviors"], token)
 
     def sensors(self) -> dict:
         return decode_response(self._call(build_get_sensors_request()))
