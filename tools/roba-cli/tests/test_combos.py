@@ -231,3 +231,18 @@ def test_set_binding_resolves_via_behaviors():
     assert d["ok"] is True
     assert len(sent_reqs) == 1
     assert sent_reqs[0].set.binding.behavior_id == 14
+
+
+from roba_cli import cli as _cli
+
+
+def test_combo_subcommands_parse():
+    p = _cli.build_parser()
+    ns = p.parse_args(["combo", "set", "0", "binding", "kp ESC"])
+    assert ns.index == 0 and ns.field == "binding" and ns.value == "kp ESC"
+    assert ns.func is _cli.cmd_combo_set
+    assert p.parse_args(["combo", "list"]).func is _cli.cmd_combo_list
+    assert p.parse_args(["combo", "get", "2"]).index == 2
+    assert p.parse_args(["combo", "reset", "1"]).func is _cli.cmd_combo_reset
+    ns2 = p.parse_args(["combo", "set", "3", "timeout-ms", "40"])
+    assert ns2.field == "timeout-ms" and ns2.value == "40"

@@ -16,6 +16,7 @@ from .holdtap_client import HoldtapClient
 from . import holdtap_client
 from .condlayer_client import CondlayerClient
 from .encoder_client import EncoderClient
+from .combos_client import CombosClient
 
 
 def _emit(obj: dict) -> None:
@@ -316,6 +317,32 @@ def cmd_encoder_behaviors(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_combo_list(args: argparse.Namespace) -> int:
+    with CombosClient(args.port) as c:
+        _emit(c.list())
+    return 0
+
+
+def cmd_combo_get(args: argparse.Namespace) -> int:
+    with CombosClient(args.port) as c:
+        _emit(c.get(args.index))
+    return 0
+
+
+def cmd_combo_set(args: argparse.Namespace) -> int:
+    with CombosClient(args.port) as c:
+        res = c.set(args.index, args.field, args.value)
+    _emit(res)
+    return 0 if res["ok"] else 1
+
+
+def cmd_combo_reset(args: argparse.Namespace) -> int:
+    with CombosClient(args.port) as c:
+        res = c.reset(args.index)
+    _emit(res)
+    return 0 if res["ok"] else 1
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="roba")
     parser.add_argument("--port", default=None,
@@ -423,6 +450,20 @@ def build_parser() -> argparse.ArgumentParser:
     e_reset.set_defaults(func=cmd_encoder_reset)
     enc.add_parser("behaviors", help="list live behaviors (id, display_name)").set_defaults(
         func=cmd_encoder_behaviors)
+    cmb = sub.add_parser("combo", help="runtime combos (zmk__combos)").add_subparsers(
+        dest="combo_cmd", required=True)
+    cmb.add_parser("list", help="List all combos as JSON").set_defaults(func=cmd_combo_list)
+    cg = cmb.add_parser("get", help="Show one combo")
+    cg.add_argument("index", type=int)
+    cg.set_defaults(func=cmd_combo_get)
+    cs = cmb.add_parser("set", help="Set a combo field")
+    cs.add_argument("index", type=int)
+    cs.add_argument("field", choices=["binding", "timeout-ms", "require-prior-idle-ms", "layers", "slow-release"])
+    cs.add_argument("value", help="behavior 'kp ESC'/'raw id p1 p2'; int; csv layers; or bool")
+    cs.set_defaults(func=cmd_combo_set)
+    cr = cmb.add_parser("reset", help="Revert a combo to its devicetree default")
+    cr.add_argument("index", type=int)
+    cr.set_defaults(func=cmd_combo_reset)
     sub.add_parser("reset", help="Revert nvs to devicetree defaults").set_defaults(func=cmd_reset)
     snap = sub.add_parser("snapshot", help="Save raw keymap bytes for record")
     snap.add_argument("path", nargs="?", default=None)
