@@ -287,11 +287,9 @@ path.combo {
 <g transform="translate(208, 225)" class="key keypos-37">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
 <text x="0" y="0" class="key tap">
-<tspan x="0" dy="-0.9em" style="font-size: 64%">&amp;to_layer_0</tspan><tspan x="0" dy="1.2em" style="font-size: 64%">LANG2</tspan>
+<tspan x="0" dy="-1.2em" style="font-size: 64%">&amp;lt_to_lay…</tspan><tspan x="0" dy="1.2em" style="font-size: 64%">9</tspan><tspan x="0" dy="1.2em" style="font-size: 64%">LANG2</tspan>
 </text>
-<a href="#SETTING">
-<text x="0" y="24" class="key hold layer-activator">SETTING</text>
-</a></g>
+</g>
 <g transform="translate(271, 231) rotate(9.0)" class="key keypos-38">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
 <text x="0" y="0" class="key tap">SPACE</text>
@@ -301,11 +299,9 @@ path.combo {
 <g transform="translate(333, 247) rotate(20.0)" class="key keypos-39">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
 <text x="0" y="0" class="key tap">
-<tspan x="0" dy="-0.9em" style="font-size: 64%">&amp;to_layer_0</tspan><tspan x="0" dy="1.2em" style="font-size: 64%">LANG1</tspan>
+<tspan x="0" dy="-1.2em" style="font-size: 64%">&amp;lt_to_lay…</tspan><tspan x="0" dy="1.2em" style="font-size: 64%">6</tspan><tspan x="0" dy="1.2em" style="font-size: 64%">LANG1</tspan>
 </text>
-<a href="#ARROW">
-<text x="0" y="24" class="key hold layer-activator">ARROW</text>
-</a></g>
+</g>
 <g transform="translate(423, 247) rotate(-20.0)" class="key keypos-40">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
 <text x="0" y="0" class="key tap"><tspan style="font-size: 78%">BACKSPACE</tspan></text>
