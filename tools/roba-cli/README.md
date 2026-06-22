@@ -1,4 +1,4 @@
-# roba-cli (SP0 / SP1 / W1a / W1b / W2a)
+# roba-cli (SP0 / SP1 / W1a / W1b / W2a / W2b)
 
 roBa を USB シリアル経由で焼かずに設定変更する CLI。
 
@@ -53,6 +53,16 @@ set 可能な field: `scale-multiplier`, `scale-divisor`, `rotation`, `x-invert`
 - `roba holdtap reset <slot>` — そのスロットを devicetree 既定へ（live で復帰）
 
 set は NVS 永続。`roba holdtap reset` または `roba reset` で既定へ。例: `roba holdtap set 0 tapping-term-ms 120` で 0 番の hold 判定が速くなる。
+
+### conditional layers（zmk__condlayers・焼き直し不要）
+自前モジュール `qtrnmr/zmk-module-runtime-conditional-layers`（core `conditional_layer.c` の逐語フォーク、判定ロジック不変）で、各 conditional layer の `if-layers`/`then-layer` を runtime 編集する。**初回のみ flash 要**。roBa keymap の `conditional_layers` ノードは compatible `zmk,runtime-conditional-layers` に切替済み。entry index 0..N-1（roBa は 5）。
+
+- `roba condlayer list` — 全エントリを JSON 列挙（if_layers は層番号リスト）
+- `roba condlayer get <index>` — 1エントリ
+- `roba condlayer set <index> <if_csv> <then>` — 例 `roba condlayer set 0 1,7 13`（層1と7が同時 active なら層13を活性）。変更前は `.roba-backup.jsonl` に記録
+- `roba condlayer reset <index>` — devicetree 既定へ（live 復帰）
+
+set は NVS 永続。`roba condlayer reset` または `roba reset` で既定へ。
 
 ## マクロ DSL
     type <text>       — ASCII 文字をキーとして送信
