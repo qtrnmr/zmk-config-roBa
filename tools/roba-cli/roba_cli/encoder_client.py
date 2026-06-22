@@ -143,3 +143,121 @@ def decode_response(resp: "rsr_pb2.Response") -> dict:
     elif which in ("set_layer_cw_binding", "set_layer_ccw_binding"):
         out["ok"] = bool(getattr(resp, which).success)
     return out
+
+
+DEFAULT_TAP_MS = 20
+
+
+class BehaviorResolutionError(RuntimeError):
+    pass
+
+
+class EncoderClient:
+    def __init__(self, port: str | None = None, baud: int = rpc.DEFAULT_BAUD, _ser=None):
+        if _ser is not None:
+            self._ser = _ser
+        else:
+            target = port or rpc.find_port()
+            self._ser = serial.Serial(target, baud, timeout=0.1)
+        self._index: int | None = None
+        self._rid = 0
+
+    def close(self) -> None:
+        self._ser.close()
+
+    def __enter__(self) -> "EncoderClient":
+        return self
+
+    def __exit__(self, *_) -> None:
+        self.close()
+
+    def _next_rid(self) -> int:
+        self._rid += 1
+        return self._rid
+
+    def _resolve_index(self) -> int:
+        if self._index is not None:
+            return self._index
+        req = studio_pb2.Request()
+        req.request_id = self._next_rid()
+        req.custom.list_custom_subsystems.CopyFrom(custom_pb2.ListCustomSubsystemRequest())
+        resp = rpc.send_recv(self._ser, req)
+        css = resp.request_response.custom.list_custom_subsystems
+        for sub in css.subsystems:
+            if sub.identifier == SUBSYSTEM_ID:
+                self._index = sub.index
+                return sub.index
+        raise RuntimeError(
+            f"'{SUBSYSTEM_ID}' subsystem not found. "
+            f"Available: {[(s.identifier, s.index) for s in css.subsystems]}"
+        )
+
+    def _call(self, rsr_req: "rsr_pb2.Request") -> "rsr_pb2.Response":
+        idx = self._resolve_index()
+        sreq = studio_pb2.Request()
+        sreq.request_id = self._next_rid()
+        sreq.custom.call.subsystem_index = idx
+        sreq.custom.call.payload = rsr_req.SerializeToString()
+        sresp = rpc.send_recv(self._ser, sreq)
+        out = rsr_pb2.Response()
+        out.ParseFromString(sresp.request_response.custom.call.payload)
+        return out
+
+    def _behavior_ids(self) -> set[int]:
+        """Live behavior local_id set via the core behaviors RPC."""
+        req = studio_pb2.Request()
+        req.request_id = self._next_rid()
+        req.behaviors.list_all_behaviors.SetInParent()
+        resp = rpc.send_recv(self._ser, req)
+        return set(resp.request_response.behaviors.list_all_behaviors.behaviors)
+
+    def resolve_behavior_local_id(self, token: str) -> int:
+        if token not in BEHAVIOR_DEV_NAME:
+            raise BehaviorResolutionError(f"no device name known for token {token!r}")
+        candidate = crc16_ansi(BEHAVIOR_DEV_NAME[token].encode())
+        live = self._behavior_ids()
+        if candidate in live:
+            return candidate
+        raise BehaviorResolutionError(
+            f"crc16 id {candidate} for '{token}' ({BEHAVIOR_DEV_NAME[token]}) "
+            f"not in live behavior ids {sorted(live)}. The firmware may use the "
+            f"settings-table local-id mode; use 'roba encoder behaviors' to list "
+            f"ids and pass 'raw <id> <param1> [param2]'."
+        )
+
+    def sensors(self) -> dict:
+        return decode_response(self._call(build_get_sensors_request()))
+
+    def get(self, sensor: int = 0) -> dict:
+        return decode_response(self._call(build_get_request(sensor)))
+
+    def behaviors(self) -> dict:
+        """List live behaviors as {id, display_name} for discovery."""
+        ids = sorted(self._behavior_ids())
+        out = []
+        for bid in ids:
+            req = studio_pb2.Request()
+            req.request_id = self._next_rid()
+            req.behaviors.get_behavior_details.behavior_id = bid
+            resp = rpc.send_recv(self._ser, req)
+            d = resp.request_response.behaviors.get_behavior_details
+            out.append({"id": bid, "display_name": d.display_name})
+        return {"ok": True, "error": "", "behaviors": out}
+
+    def set(self, sensor: int, layer: int, direction: str, spec: str,
+            tap_ms: int | None = None) -> dict:
+        token, behavior_id, param1, param2 = parse_encoder_behavior(spec)
+        if token is not None:
+            behavior_id = self.resolve_behavior_local_id(token)
+        tms = DEFAULT_TAP_MS if tap_ms is None else tap_ms
+        return decode_response(self._call(
+            build_set_request(direction, sensor, layer, behavior_id, param1, param2, tms)))
+
+    def reset(self, sensor: int, layer: int) -> dict:
+        """Revert a layer: set cw and ccw behavior_id 0 -> DT-default fallback."""
+        cw = decode_response(self._call(
+            build_set_request("cw", sensor, layer, 0, 0, 0, DEFAULT_TAP_MS)))
+        ccw = decode_response(self._call(
+            build_set_request("ccw", sensor, layer, 0, 0, 0, DEFAULT_TAP_MS)))
+        ok = cw.get("ok") and ccw.get("ok")
+        return {"ok": bool(ok), "error": cw.get("error") or ccw.get("error", "")}

@@ -84,3 +84,74 @@ def test_rsr_proto_imports_and_fields_exist():
     lb = rsr_pb2.LayerBindings()
     lnames = {f.name for f in lb.DESCRIPTOR.fields}
     assert {"layer", "cw_binding", "ccw_binding"} <= lnames
+
+
+import studio_pb2
+import custom_pb2
+from roba_cli.framing import encode_frame
+
+
+class _FakeSerial:
+    def __init__(self, payload: bytes):
+        self._payload = bytearray(payload)
+        self.written = bytearray()
+
+    def write(self, b):
+        self.written += b
+
+    def flush(self):
+        pass
+
+    def read(self, n):
+        if not self._payload:
+            return b""
+        out = bytes(self._payload[:n])
+        del self._payload[:n]
+        return out
+
+
+def _custom_call_frame(rsr_resp: "rsr_pb2.Response") -> bytes:
+    s = studio_pb2.Response()
+    s.request_response.request_id = 1
+    s.request_response.custom.call.payload = rsr_resp.SerializeToString()
+    return encode_frame(s.SerializeToString())
+
+
+def test_get_decodes_over_custom_envelope():
+    r = rsr_pb2.Response()
+    lb = r.get_all_layer_bindings.bindings.add()
+    lb.layer = 0
+    lb.cw_binding.behavior_id = 13527
+    lb.cw_binding.param1 = 10
+    c = ec.EncoderClient(_ser=_FakeSerial(_custom_call_frame(r)))
+    c._index = 0
+    d = c.get(0)
+    assert d["ok"] is True and d["bindings"][0]["cw"]["behavior_id"] == 13527
+
+
+def test_sensors_decodes_over_custom_envelope():
+    r = rsr_pb2.Response()
+    s0 = r.get_sensors.sensors.add(); s0.index = 0; s0.name = "encoder_left"
+    s1 = r.get_sensors.sensors.add(); s1.index = 1; s1.name = "encoder_right"
+    c = ec.EncoderClient(_ser=_FakeSerial(_custom_call_frame(r)))
+    c._index = 0
+    d = c.sensors()
+    assert [s["name"] for s in d["sensors"]] == ["encoder_left", "encoder_right"]
+
+
+def test_resolve_behavior_local_id_crc16_when_present():
+    # behavior list contains the crc16 id -> resolves
+    c = ec.EncoderClient(_ser=_FakeSerial(b""))
+    c._index = 0
+    c._behavior_ids = lambda: {13527, 7776, 99}   # stub the live id set
+    assert c.resolve_behavior_local_id("kp") == 13527
+    assert c.resolve_behavior_local_id("msc") == 7776
+
+
+def test_resolve_behavior_local_id_raises_when_absent():
+    import pytest
+    c = ec.EncoderClient(_ser=_FakeSerial(b""))
+    c._index = 0
+    c._behavior_ids = lambda: {1, 2, 3}
+    with pytest.raises(ec.BehaviorResolutionError):
+        c.resolve_behavior_local_id("kp")
