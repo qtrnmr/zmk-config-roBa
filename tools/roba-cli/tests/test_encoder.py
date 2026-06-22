@@ -155,3 +155,19 @@ def test_resolve_behavior_local_id_raises_when_absent():
     c._behavior_ids = lambda: {1, 2, 3}
     with pytest.raises(ec.BehaviorResolutionError):
         c.resolve_behavior_local_id("kp")
+
+
+from roba_cli import cli as _cli
+
+
+def test_encoder_subcommands_parse():
+    p = _cli.build_parser()
+    ns = p.parse_args(["encoder", "set", "0", "2", "cw", "msc SCRL_DOWN"])
+    assert ns.sensor == 0 and ns.layer == 2 and ns.direction == "cw"
+    assert ns.behavior == "msc SCRL_DOWN" and ns.func is _cli.cmd_encoder_set
+    ns2 = p.parse_args(["encoder", "get", "--sensor", "1"])
+    assert ns2.sensor == 1 and ns2.func is _cli.cmd_encoder_get
+    assert p.parse_args(["encoder", "sensors"]).func is _cli.cmd_encoder_sensors
+    assert p.parse_args(["encoder", "behaviors"]).func is _cli.cmd_encoder_behaviors
+    ns3 = p.parse_args(["encoder", "reset", "0", "2"])
+    assert ns3.sensor == 0 and ns3.layer == 2 and ns3.func is _cli.cmd_encoder_reset
