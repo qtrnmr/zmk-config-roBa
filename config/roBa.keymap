@@ -154,7 +154,7 @@
         };
 
         lt_to_layer_0: lt_to_layer_0 {
-            compatible = "zmk,behavior-hold-tap";
+            compatible = "zmk,behavior-runtime-hold-tap";
             label = "LAYER_TAP_TO_0";
             bindings = <&mo>, <&to_layer_0>;
 
