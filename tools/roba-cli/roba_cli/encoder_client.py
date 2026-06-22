@@ -12,7 +12,6 @@ import serial
 import roba_cli.proto  # noqa: F401  sets sys.path
 import studio_pb2
 import custom_pb2
-import behaviors_pb2
 from roba_cli.proto.cormoran.rsr import custom_pb2 as rsr_pb2
 
 from . import rpc

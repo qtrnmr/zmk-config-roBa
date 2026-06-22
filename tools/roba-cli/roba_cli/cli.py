@@ -297,15 +297,17 @@ def cmd_encoder_get(args: argparse.Namespace) -> int:
 
 def cmd_encoder_set(args: argparse.Namespace) -> int:
     with EncoderClient(args.port) as c:
-        _emit(c.set(args.sensor, args.layer, args.direction, args.behavior,
-                    tap_ms=args.tap_ms))
-    return 0
+        res = c.set(args.sensor, args.layer, args.direction, args.behavior,
+                    tap_ms=args.tap_ms)
+    _emit(res)
+    return 0 if res["ok"] else 1
 
 
 def cmd_encoder_reset(args: argparse.Namespace) -> int:
     with EncoderClient(args.port) as c:
-        _emit(c.reset(args.sensor, args.layer))
-    return 0
+        res = c.reset(args.sensor, args.layer)
+    _emit(res)
+    return 0 if res["ok"] else 1
 
 
 def cmd_encoder_behaviors(args: argparse.Namespace) -> int:
