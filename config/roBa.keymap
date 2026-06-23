@@ -279,7 +279,7 @@
 
         MOUSE {
             bindings = <
-&trans  &trans  &trans  &trans  &trans                      &trans  &kp LC(LG(LEFT))  &kp LC(E)  &kp LC(LG(RIGHT))  &mt LC(LS(T)) LC(W)
+&trans  &trans  &trans  &trans  &trans                      &trans  &kp LC(LG(LEFT))  &kp LA(TAB)  &kp LC(LG(RIGHT))  &mt LC(LS(T)) LC(W)
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans  &mkp MB1          &mkp MB3   &mkp MB2           &trans
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans  &mkp MB4          &trans     &mkp MB5           &trans
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans                                                  &trans
@@ -306,7 +306,7 @@
 
         APPLE_MOUSE {
             bindings = <
-&trans  &trans  &trans  &trans  &trans                      &trans  &kp LC(LEFT)  &trans  &kp LC(RIGHT)  &mt LG(LS(T)) LG(W)
+&trans  &trans  &trans  &trans  &trans                      &trans  &kp LC(LEFT)  &kp LG(TAB)  &kp LC(RIGHT)  &mt LG(LS(T)) LG(W)
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans  &trans        &trans  &trans         &trans
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans  &trans        &trans  &trans         &trans
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans                                      &trans
@@ -324,7 +324,7 @@
 
         TOUCH_MOUSE {
             bindings = <
-&trans  &trans  &trans  &trans  &trans                      &trans  &none  &kp LG(TAB)  &kp LG(H)  &mt LG(LS(T)) LG(W)
+&trans  &trans  &trans  &trans  &trans                      &trans  &rt_macro 1  &kp LG(TAB)  &rt_macro 2  &mt LG(LS(T)) LG(W)
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans  &trans       &trans       &trans      &trans
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans  &trans       &trans       &trans      &trans
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans                                       &trans
