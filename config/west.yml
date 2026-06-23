@@ -30,13 +30,7 @@ manifest:
       # zmk_keymap_layer_activate/deactivate that this v0.3-branch+dya base
       # provides. Module `main` migrated to zmk v4 (2-arg) and won't build here.
       revision: zmk-v0.3.0.0
-    - name: zmk-module-runtime-macro
-      remote: qtrnmr-gh
-      revision: main
-    - name: zmk-module-runtime-holdtap
-      remote: qtrnmr-gh
-      revision: main
-    - name: zmk-module-runtime-conditional-layers
+    - name: zmk-module-runtime-config
       remote: qtrnmr-gh
       revision: main
     - name: zmk-behavior-runtime-sensor-rotate
@@ -45,8 +39,5 @@ manifest:
       # pre-"Migrate to zmk v4" release and keeps the full custom-RPC surface
       # against this v0.3-branch+dya base. Module `main` won't build here.
       revision: zmk-v0.3.0.0
-    - name: zmk-module-runtime-combos
-      remote: qtrnmr-gh
-      revision: main
   self:
     path: config
