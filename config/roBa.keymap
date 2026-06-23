@@ -10,19 +10,16 @@
 
 #define L_DEFAULT      0
 #define L_APPLE        1
-#define L_IPAD         2
-#define L_IPHONE       3
-#define L_FUNCTION     4
-#define L_NUM          5
-#define L_ARROW        6
-#define L_MOUSE        7
-#define L_SCROLL       8
-#define L_SETTING      9
-#define L_APPLEMOUSE   10
-#define L_IPAD_ARROW   11
-#define L_IPHONE_ARROW 12
-#define L_IPAD_MOUSE   13
-#define L_IPHONE_MOUSE 14
+#define L_APPLE_TOUCH  2
+#define L_FUNCTION     3
+#define L_NUM          4
+#define L_ARROW        5
+#define L_MOUSE        6
+#define L_SCROLL       7
+#define L_SETTING      8
+#define L_APPLEMOUSE   9
+#define L_TOUCH_ARROW  10
+#define L_TOUCH_MOUSE  11
 
 &mt {
     flavor = "balanced";
@@ -79,7 +76,7 @@
         redo_apple {
             bindings = <&kp LG(LS(Z))>;
             key-positions = <22 23 24>;
-            layers = <L_APPLE L_APPLEMOUSE L_IPAD L_IPHONE L_IPAD_MOUSE L_IPHONE_MOUSE>;
+            layers = <L_APPLE L_APPLEMOUSE L_APPLE_TOUCH L_TOUCH_MOUSE>;
         };
     };
 
@@ -98,53 +95,48 @@
             label = "TO_APPLE_DEFAULT";
         };
 
-        to_ipad: to_ipad {
+        to_apple_touch: to_apple_touch {
             compatible = "zmk,behavior-macro-one-param";
             #binding-cells = <1>;
-            bindings = <&to L_IPAD &macro_param_1to1 &kp MACRO_PLACEHOLDER>;
-            label = "TO_IPAD";
+            bindings = <&to L_APPLE_TOUCH &macro_param_1to1 &kp MACRO_PLACEHOLDER>;
+            label = "TO_APPLE_TOUCH";
         };
 
-        to_iphone: to_iphone {
-            compatible = "zmk,behavior-macro-one-param";
-            #binding-cells = <1>;
-            bindings = <&to L_IPHONE &macro_param_1to1 &kp MACRO_PLACEHOLDER>;
-            label = "TO_IPHONE";
-        };
-
-        bt_to_win0: bt_to_win0 {
+        // BT profile -> base-layer routing. Key position fixed (H/J/K/L/SQT),
+        // BT_SEL number fixed; only the &to base-layer differs (案B 2026-06-24).
+        bt_h_win: bt_h_win {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
-            bindings = <&bt BT_SEL 0 &to L_DEFAULT>;
-            label = "BT_TO_WIN0";
+            bindings = <&bt BT_SEL 4 &to L_DEFAULT>;
+            label = "BT_H_WIN";
         };
 
-        bt_to_win1: bt_to_win1 {
+        bt_j_mac: bt_j_mac {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&bt BT_SEL 0 &to L_APPLE>;
+            label = "BT_J_MAC";
+        };
+
+        bt_k_win: bt_k_win {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
             bindings = <&bt BT_SEL 1 &to L_DEFAULT>;
-            label = "BT_TO_WIN1";
+            label = "BT_K_WIN";
         };
 
-        bt_to_mac: bt_to_mac {
+        bt_l_ipad: bt_l_ipad {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
-            bindings = <&bt BT_SEL 2 &to L_APPLE>;
-            label = "BT_TO_MAC";
+            bindings = <&bt BT_SEL 2 &to L_APPLE_TOUCH>;
+            label = "BT_L_IPAD";
         };
 
-        bt_to_ipad: bt_to_ipad {
+        bt_sqt_iphone: bt_sqt_iphone {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
-            bindings = <&bt BT_SEL 3 &to L_IPAD>;
-            label = "BT_TO_IPAD";
-        };
-
-        bt_to_iphone: bt_to_iphone {
-            compatible = "zmk,behavior-macro";
-            #binding-cells = <0>;
-            bindings = <&bt BT_SEL 4 &to L_IPHONE>;
-            label = "BT_TO_IPHONE";
+            bindings = <&bt BT_SEL 3 &to L_APPLE_TOUCH>;
+            label = "BT_SQT_IPHONE";
         };
     };
 
@@ -172,19 +164,10 @@
             tapping-term-ms = <200>;
         };
 
-        lt_to_ipad: lt_to_ipad {
+        lt_to_apple_touch: lt_to_apple_touch {
             compatible = "zmk,behavior-runtime-hold-tap";
-            label = "LAYER_TAP_TO_IPAD";
-            bindings = <&mo>, <&to_ipad>;
-
-            #binding-cells = <2>;
-            tapping-term-ms = <200>;
-        };
-
-        lt_to_iphone: lt_to_iphone {
-            compatible = "zmk,behavior-runtime-hold-tap";
-            label = "LAYER_TAP_TO_IPHONE";
-            bindings = <&mo>, <&to_iphone>;
+            label = "LAYER_TAP_TO_APPLE_TOUCH";
+            bindings = <&mo>, <&to_apple_touch>;
 
             #binding-cells = <2>;
             tapping-term-ms = <200>;
