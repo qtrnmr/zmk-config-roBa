@@ -48,7 +48,7 @@
 
 / {
     combos {
-        compatible = "zmk,combos";
+        compatible = "zmk,runtime-combos";
 
         tab {
             bindings = <&kp TAB>;
