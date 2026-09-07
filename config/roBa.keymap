@@ -8,16 +8,19 @@
 
 #define ZMK_POINTING_DEFAULT_SCRL_VAL 80
 
+// Base layers (DEFAULT/APPLE/ANDROID) MUST stay at the lowest indices: ZMK
+// resolves a key from the highest active layer, so a base layer numbered
+// above SETTING/MOUSE/etc. shadows every momentary layer (bug seen 2026-09-07).
 #define L_DEFAULT       0
 #define L_APPLE         1
-#define L_FUNCTION      2
-#define L_NUM           3
-#define L_ARROW         4
-#define L_MOUSE         5
-#define L_SCROLL        6
-#define L_SETTING       7
-#define L_APPLEMOUSE    8
-#define L_ANDROID       9
+#define L_ANDROID       2
+#define L_FUNCTION      3
+#define L_NUM           4
+#define L_ARROW         5
+#define L_MOUSE         6
+#define L_SCROLL        7
+#define L_SETTING       8
+#define L_APPLEMOUSE    9
 #define L_ANDROID_MOUSE 10
 #define L_ANDROID_ARROW 11
 
@@ -225,6 +228,20 @@
             sensor-bindings = <&encoder_vol_down_up>;
         };
 
+        // Android (Galaxy Z Fold 8). Meta = LEFT_GUI. Same Ctrl-based base as
+        // DEFAULT(Win); only the hold-tap &to target differs so the
+        // conditional layers below can key off L_ANDROID.
+        ANDROID {
+            bindings = <
+&kp Q               &kp W         &kp E         &kp R                           &kp T                                                               &kp Y        &kp U  &kp I               &kp O    &kp P
+&mt LEFT_CONTROL A  &kp S         &kp D         &kp F                           &kp G        &kp K_MUTE                              &kp MINUS      &kp H        &kp J  &kp K               &kp L    &kp SQT
+&mt LEFT_SHIFT Z    &kp X         &kp C         &kp V                           &kp B        &mo L_SETTING                           &kp SEMICOLON  &kp N        &kp M  &lt L_SCROLL COMMA  &kp DOT  &kp SLASH
+&kp LCTRL           &kp LEFT_WIN  &kp LEFT_ALT  &lt_to_android L_SETTING LANG2  &lt L_NUM SPACE  &lt_to_android L_ARROW LANG1      &kp BACKSPACE  &lt L_FUNCTION ENTER                               &kp DEL
+            >;
+
+            sensor-bindings = <&encoder_vol_down_up>;
+        };
+
         FUNCTION {
             bindings = <
 &trans        &trans        &kp ASTERISK  &kp SLASH     &none                               &none         &kp MINUS     &kp PLUS      &none         &none
@@ -288,20 +305,6 @@
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans  &trans        &trans  &trans         &trans
 &trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans                                      &trans
             >;
-        };
-
-        // Android (Galaxy Z Fold 8). Meta = LEFT_GUI. Same Ctrl-based base as
-        // DEFAULT(Win); only the hold-tap &to target differs so the
-        // conditional layers below can key off L_ANDROID.
-        ANDROID {
-            bindings = <
-&kp Q               &kp W         &kp E         &kp R                           &kp T                                                               &kp Y        &kp U  &kp I               &kp O    &kp P
-&mt LEFT_CONTROL A  &kp S         &kp D         &kp F                           &kp G        &kp K_MUTE                              &kp MINUS      &kp H        &kp J  &kp K               &kp L    &kp SQT
-&mt LEFT_SHIFT Z    &kp X         &kp C         &kp V                           &kp B        &mo L_SETTING                           &kp SEMICOLON  &kp N        &kp M  &lt L_SCROLL COMMA  &kp DOT  &kp SLASH
-&kp LCTRL           &kp LEFT_WIN  &kp LEFT_ALT  &lt_to_android L_SETTING LANG2  &lt L_NUM SPACE  &lt_to_android L_ARROW LANG1      &kp BACKSPACE  &lt L_FUNCTION ENTER                               &kp DEL
-            >;
-
-            sensor-bindings = <&encoder_vol_down_up>;
         };
 
         // U/O = split-screen left/right (Meta+Ctrl+Left/Right), I = app switch
