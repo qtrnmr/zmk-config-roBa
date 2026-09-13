@@ -219,7 +219,7 @@
             bindings = <
 &kp Q               &kp W         &kp E         &kp R                        &kp T                                                            &kp Y        &kp U  &kp I               &kp O    &kp P
 &mt LEFT_CONTROL A  &kp S         &kp D         &kp F                        &kp G        &kp K_MUTE                           &kp MINUS      &kp H        &kp J  &kp K               &kp L    &kp SQT
-&mt LEFT_SHIFT Z    &kp X         &kp C         &kp V                        &kp B        &mo L_SETTING                        &kp SEMICOLON  &kp N        &kp M  &lt L_SCROLL COMMA  &kp DOT  &kp SLASH
+&mt LEFT_SHIFT Z    &kp X         &kp C         &kp V                        &kp B        &mo L_SETTING                        &kp SEMICOLON  &kp N        &kp M  &lt L_SCROLL COMMA  &kp DOT  &mt RIGHT_SHIFT SLASH
 &kp LCTRL           &kp LEFT_WIN  &kp LEFT_ALT  &lt_to_layer_0 L_SETTING LANG2  &lt L_NUM SPACE  &lt_to_layer_0 L_ARROW LANG1      &kp BACKSPACE  &lt L_FUNCTION ENTER                               &kp DEL
             >;
 
@@ -230,7 +230,7 @@
             bindings = <
 &kp Q             &kp W         &kp E         &kp R                                 &kp T                                                                     &kp Y        &kp U  &kp I               &kp O    &kp P
 &mt LEFT_GUI A    &kp S         &kp D         &kp F                                 &kp G        &kp K_MUTE                                    &kp MINUS      &kp H        &kp J  &kp K               &kp L    &kp SQT
-&mt LEFT_SHIFT Z  &kp X         &kp C         &kp V                                 &kp B        &mo L_SETTING                                 &kp SEMICOLON  &kp N        &kp M  &lt L_SCROLL COMMA  &kp DOT  &kp SLASH
+&mt LEFT_SHIFT Z  &kp X         &kp C         &kp V                                 &kp B        &mo L_SETTING                                 &kp SEMICOLON  &kp N        &kp M  &lt L_SCROLL COMMA  &kp DOT  &mt RIGHT_SHIFT SLASH
 &kp LEFT_GUI      &kp LCTRL     &kp LEFT_ALT  &lt_to_apple_default L_SETTING LANG2  &lt L_NUM SPACE  &lt_to_apple_default L_ARROW LANG1      &kp BACKSPACE  &lt L_FUNCTION ENTER                               &kp DEL
             >;
 
@@ -244,7 +244,7 @@
             bindings = <
 &kp Q               &kp W         &kp E         &kp R                           &kp T                                                               &kp Y        &kp U  &kp I               &kp O    &kp P
 &mt LEFT_CONTROL A  &kp S         &kp D         &kp F                           &kp G        &kp K_MUTE                              &kp MINUS      &kp H        &kp J  &kp K               &kp L    &kp SQT
-&mt LEFT_SHIFT Z    &kp X         &kp C         &kp V                           &kp B        &mo L_SETTING                           &kp SEMICOLON  &kp N        &kp M  &lt L_SCROLL COMMA  &kp DOT  &kp SLASH
+&mt LEFT_SHIFT Z    &kp X         &kp C         &kp V                           &kp B        &mo L_SETTING                           &kp SEMICOLON  &kp N        &kp M  &lt L_SCROLL COMMA  &kp DOT  &mt RIGHT_SHIFT SLASH
 &kp LCTRL           &kp LEFT_WIN  &kp LEFT_ALT  &lt_to_android L_SETTING LANG2  &lt L_NUM SPACE  &lt_to_android L_ARROW LANG1      &kp BACKSPACE  &lt L_FUNCTION ENTER                               &kp DEL
             >;
 
