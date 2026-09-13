@@ -289,11 +289,14 @@
             >;
         };
 
+        // SETTING + / (right pinky, bottom row) = &bootloader: puts the RIGHT half
+        // into the UF2 bootloader without touching the reset button (reset-type
+        // behaviors run on the half that produced the key event).
         SETTING {
             bindings = <
 &bt BT_CLR  &trans  &trans  &trans  &trans                      &trans          &trans        &trans        &trans      &studio_unlock
 &trans      &trans  &trans  &trans  &trans  &trans      &trans  &bt_h_fold     &bt_j_mac     &bt_k_win     &none       &none
-&rt_macro 0  &trans  &trans  &trans  &trans  &trans      &trans  &trans         &trans        &trans        &trans      &trans
+&rt_macro 0  &trans  &trans  &trans  &trans  &trans      &trans  &trans         &trans        &trans        &trans      &bootloader
 &trans      &trans  &trans  &trans  &trans  &trans      &trans  &trans                                                 &trans
             >;
         };
