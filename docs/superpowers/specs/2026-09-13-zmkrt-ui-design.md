@@ -210,7 +210,7 @@ Dev workflow: `pnpm dev` (Vite dev server proxies `/api` to `127.0.0.1:8760`, ru
 - **vitest** (`cli/ui`): `prettyKeycode`, layout geometry (rotation/bounds), label
   component selection.
 - **HIL acceptance** (real roBa over USB, run by the implementer on this Mac):
-  1. `zmkrt ui` opens the browser; keyboard renders 44 keys in roBa shape; 12 layers
+  1. `zmkrt ui` opens the browser; keyboard renders 43 keys in roBa shape; 12 layers
      listed with names.
   2. Select `DEFAULT` pos 0 (Q): change to `Key Press W` → device types `w`; change log
      shows the entry; set back to `Q` → types `q`.
